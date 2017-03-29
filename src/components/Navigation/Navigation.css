@@ -22,11 +22,11 @@
 .link,
 .link:active,
 .link:visited {
-  color: rgba(255, 255, 255, 0.6);
+    color: #AFAFAF;
 }
 
 .link:hover {
-  color: rgba(255, 255, 255, 1);
+    color: #AFAFAF;
 }
 
 .highlight {

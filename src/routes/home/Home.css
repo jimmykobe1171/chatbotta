@@ -12,23 +12,34 @@
 .root {
   padding-left: 20px;
   padding-right: 20px;
+  background-color: #F9F8F6;
 }
 
 .container {
   margin: 0 auto;
   padding: 0 0 40px;
   max-width: var(--max-content-width);
+  position: relative;
+  top: 20px;
+
 }
 
+.passage{
+  width: 460px;
+  height: 260px;
+  float: right;
+}
+
+/*
 .newsItem {
   margin: 0 0 2rem;
 }
 
 .newsTitle {
   font-size: 1.5rem;
-}
+}*/
 
-.newsDesc {
+/*.newsDesc {
   h1,
   h2,
   h3,
@@ -46,4 +57,4 @@
   img {
     max-width: 100%;
   }
-}
+}*/
