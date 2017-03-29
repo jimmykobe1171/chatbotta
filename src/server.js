@@ -29,6 +29,7 @@ import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import { port, auth } from './config';
 
+
 const app = express();
 
 //
@@ -55,6 +56,7 @@ app.use(expressJwt({
   getToken: req => req.cookies.id_token,
 }));
 app.use(passport.initialize());
+app.use(passport.session());
 
 if (__DEV__) {
   app.enable('trust proxy');
@@ -157,7 +159,7 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 // Launch the server
 // -----------------------------------------------------------------------------
 /* eslint-disable no-console */
-models.sync().catch(err => console.error(err.stack)).then(() => {
+models.sync({ force: true }).catch(err => console.error(err.stack)).then(() => {
   app.listen(port, () => {
     console.log(`The server is running at http://localhost:${port}/`);
   });

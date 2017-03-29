@@ -11,7 +11,6 @@ import sequelize from '../sequelize';
 import User from './User';
 
 
-
 // User.hasMany(UserLogin, {
 //   foreignKey: 'userId',
 //   as: 'logins',
