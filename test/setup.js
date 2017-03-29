@@ -10,6 +10,7 @@
 /* Configure Mocha test runner, see package.json/scripts/test */
 
 process.env.NODE_ENV = 'test';
+process.env.DATABASE_URL = 'sqlite:test_database.sqlite';
 
 function noop() {
   return null;
