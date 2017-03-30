@@ -15,6 +15,12 @@ import Feedback from '../Feedback';
 import Footer from '../Footer';
 
 class Layout extends React.Component {
+
+  logInPage(){
+    if(Header.Navigation.state.LogInPopUp){
+    alert("place holder");}
+  }
+
   static propTypes = {
     children: PropTypes.node.isRequired,
   };
@@ -24,6 +30,7 @@ class Layout extends React.Component {
       <div>
         <Header />
         {this.props.children}
+        logInPage()
         {
         // <Feedback />
       }

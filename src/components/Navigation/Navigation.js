@@ -25,16 +25,33 @@ const muiTheme = getMuiTheme({
   },
 }, { userAgent: 'all' });
 
-const LogIn = () => (
-  <RaisedButton label="Log in" />
-);
+class LogIn extends React.Component{
+  constructor(props) {
+    super(props);
+    this.popUp = this.popUp.bind(this);
+    this.state = {logInPopUp: false};
+  }
 
-const SignUp = () => (
-  <RaisedButton 
-  label="Sign up"
-  primary={true}
-  />
-);
+  popUp(){
+    this.setState({logInPopUp: true});
+  }
+
+  renderNormal(){
+    return (
+      <RaisedButton label="Log in" onClick={this.popUp} />
+    )
+  }
+  renderPopUp(){
+    return(
+        <RaisedButton label="Log in" disabled={true} />
+    )
+  }
+  render() {
+    return (this.state.logInPopUp) ? this.renderPopUp()
+                                : this.renderNormal()
+    }
+}
+
 
 class Navigation extends React.Component {
   render() {
@@ -45,14 +62,11 @@ class Navigation extends React.Component {
         <Link className={s.link} to="/contact">Contact</Link>
         <span className={s.spacer}> | </span>
         <LogIn />
-        {
-        // <Link className={cx(s.link, s.lowlight)} to="/login">Log in</Link>
-        }
         <span className={s.spacer}>or</span>
-        <SignUp />
-        {
-        // <Link className={cx(s.link, s.highlight, s.link.highlight)} to="/register">Sign up</Link>
-        }
+        <RaisedButton 
+        label="Sign up"
+        primary={true}
+        />
       </div>
       </MuiThemeProvider>
     );
