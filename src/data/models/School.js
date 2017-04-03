@@ -30,7 +30,7 @@ const School = Model.define('School', {
   },
 }, {
   indexes: [
-        { fields: ['email'] },
+        { fields: ['domain'] },
   ],
 });
 
