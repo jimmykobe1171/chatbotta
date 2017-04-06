@@ -16,7 +16,17 @@ class Home extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <h1>Chatbot TA</h1>
+          <img src="robots-start.png" width="350" height="380" alt="robots-start" />
+          <div className={s.passage}>
+            <h1>Meet the bots that will make learning GREAT again</h1>
+            <p>Studies that looked at delayed vs. immediate feedback discovered that participants
+          		who were given immediate feedback showed a significantly larger increase in 
+              performance than those who had received delayed feedback.
+          		<br /><br />
+				      Our chatbots enable students to get answers right away using machine learning 
+              to parse through course materials. TAs and faculty are also relieved of routine 
+              question-answering.</p>
+          </div>
         </div>
       </div>
     );

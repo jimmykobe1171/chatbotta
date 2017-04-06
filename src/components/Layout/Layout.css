@@ -27,6 +27,14 @@ a {
   color: #0074c2;
 }
 
+.faded{
+  /* Rectangle */
+background: rgba(51, 51, 51, 0.3);
+opacity: 1.00;
+
+}
+
+
 /*
  * Remove text-shadow in selection highlight:
  * https://twitter.com/miketaylr/status/12228805301
