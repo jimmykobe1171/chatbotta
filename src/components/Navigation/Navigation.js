@@ -16,6 +16,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { blue300 } from 'material-ui/styles/colors';
 import s from './Navigation.css';
 import Link from '../Link';
+import LogInModal from './LogInModal';
+import SignUpModal from './SignUpModal';
 
 const muiTheme = getMuiTheme({
   borderRadius: 5,
@@ -47,20 +49,16 @@ class Navigation extends React.Component {
           <Link className={s.link} to="/about">About</Link>
           <Link className={s.link} to="/contact">Contact</Link>
           <span className={s.spacer}> | </span>
-          {(this.state.logInPopUp) ? <RaisedButton label="Log in" disabled />
+          {(this.state.logInPopUp) ? <RaisedButton label="Log in" labelColor="#AFAFAF" />
             : <RaisedButton label="Log in" onClick={this.logIn} labelColor="#AFAFAF" />}
           <span className={s.spacer}>or</span>
-          {(this.state.signUpPopUp) ? <RaisedButton label="Sign up" primary disabled />
+          {(this.state.signUpPopUp) ? <RaisedButton label="Sign up" primary />
             : <RaisedButton label="Sign up" onClick={this.signUp} primary />}
 
           {(this.state.logInPopUp) ?
-            <div className={s.logInPage}>
-              <h1>log in</h1>
-            </div> : null }
+            <LogInModal className={s.logInPage} /> : null }
           {(this.state.signUpPopUp) ?
-            <div className={s.signUpPage}>
-              <h1>sign up</h1>
-            </div> : null }
+            <SignUpModal className={s.signUpPage} /> : null }
         </div>
       </MuiThemeProvider>
     );
