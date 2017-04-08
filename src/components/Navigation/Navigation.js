@@ -40,30 +40,6 @@ class Navigation extends React.Component {
     this.setState({ signUpPopUp: true });
   }
 
-  logInButtonNormal() {
-    return (
-      <RaisedButton label="Log in" onClick={this.logIn} labelColor="#AFAFAF" />
-    );
-  }
-
-  logInButtonDisabled() {
-    return (
-      <RaisedButton label="Log in" disabled />
-    );
-  }
-
-  signUpButtonNormal() {
-    return (
-      <RaisedButton label="Sign up" onClick={this.signUp} primary />
-    );
-  }
-
-  signUpButtonDisabled() {
-    return (
-      <RaisedButton label="Sign up" primary disabled />
-    );
-  }
-
   render() {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
@@ -71,11 +47,11 @@ class Navigation extends React.Component {
           <Link className={s.link} to="/about">About</Link>
           <Link className={s.link} to="/contact">Contact</Link>
           <span className={s.spacer}> | </span>
-          {(this.state.logInPopUp) ? this.logInButtonDisabled()
-                                : this.logInButtonNormal()}
+          {(this.state.logInPopUp) ? <RaisedButton label="Log in" disabled />
+            : <RaisedButton label="Log in" onClick={this.logIn} labelColor="#AFAFAF" />}
           <span className={s.spacer}>or</span>
-          {(this.state.signUpPopUp) ? this.signUpButtonDisabled()
-                                : this.signUpButtonNormal()}
+          {(this.state.signUpPopUp) ? <RaisedButton label="Sign up" primary disabled />
+            : <RaisedButton label="Sign up" onClick={this.signUp} primary />}
 
           {(this.state.logInPopUp) ?
             <div className={s.logInPage}>
