@@ -9,6 +9,7 @@
 
 import sequelize from '../sequelize';
 import User from './User';
+import School from './School';
 
 
 // User.hasMany(UserLogin, {
@@ -32,3 +33,4 @@ function sync(...args) {
 
 export default { sync };
 export { User };
+export { School };
