@@ -1,8 +1,33 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-// import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
 
+
+const customContentStyle = {
+  width: '280px',
+  maxWidth: 'none',
+};
+
+const LogInTextField = () => (
+  <div>
+    <TextField
+      hintText="email"
+      fullWidth
+    /><br />
+    <TextField
+      hintText="password"
+      fullWidth
+    /><br />
+  </div>
+);
+
+const CheckRemember = () => (
+  <Checkbox
+    label="Remember me"
+  />
+);
 
 /**
  * A modal dialog can only be closed by selecting one of the actions.
@@ -41,9 +66,11 @@ export default class LogInModal extends React.Component {
           title="chatbot TA"
           actions={actions}
           modal
+          contentStyle={customContentStyle}
           open={this.state.open}
         >
-          log in.
+          <LogInTextField />
+          <CheckRemember />
         </Dialog>
       </div>
     );

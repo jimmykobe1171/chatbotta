@@ -4,6 +4,11 @@ import FlatButton from 'material-ui/FlatButton';
 // import RaisedButton from 'material-ui/RaisedButton';
 // import s from './Navigation.css';
 
+const customContentStyle = {
+  width: '280px',
+  maxWidth: 'none',
+};
+
 /**
  * A modal dialog can only be closed by selecting one of the actions.
  */
@@ -41,6 +46,7 @@ export default class SignUpModal extends React.Component {
           title="chatbot TA"
           actions={actions}
           modal
+          contentStyle={customContentStyle}
           open={this.state.open}
         >
           sign up.
