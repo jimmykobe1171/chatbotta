@@ -6,7 +6,7 @@ import Checkbox from 'material-ui/Checkbox';
 
 
 const customContentStyle = {
-  width: '280px',
+  width: '380px',
   maxWidth: 'none',
 };
 
