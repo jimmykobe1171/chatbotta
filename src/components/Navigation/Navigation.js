@@ -35,11 +35,11 @@ class Navigation extends React.Component {
   }
 
   logIn() {
-    this.setState({ logInPopUp: true });
+    this.setState({ logInPopUp: !this.state.logInPopUp });
   }
 
   signUp() {
-    this.setState({ signUpPopUp: true });
+    this.setState({ signUpPopUp: !this.state.signUpPopUp });
   }
 
   render() {
@@ -49,16 +49,18 @@ class Navigation extends React.Component {
           <Link className={s.link} to="/about">About</Link>
           <Link className={s.link} to="/contact">Contact</Link>
           <span className={s.spacer}> | </span>
-          {(this.state.logInPopUp) ? <RaisedButton label="Log in" labelColor="#AFAFAF" />
-            : <RaisedButton label="Log in" onClick={this.logIn} labelColor="#AFAFAF" />}
+          <RaisedButton label="Log in" onClick={this.logIn} labelColor="#AFAFAF" />
           <span className={s.spacer}>or</span>
-          {(this.state.signUpPopUp) ? <RaisedButton label="Sign up" primary />
-            : <RaisedButton label="Sign up" onClick={this.signUp} primary />}
+          <RaisedButton label="Sign up" onClick={this.signUp} primary />
 
           {(this.state.logInPopUp) ?
-            <LogInModal className={s.logInPage} /> : null }
+            <LogInModal
+              className={s.logInPage}
+            /> : null }
           {(this.state.signUpPopUp) ?
-            <SignUpModal className={s.signUpPage} /> : null }
+            <SignUpModal
+              className={s.signUpPage}
+            /> : null}
         </div>
       </MuiThemeProvider>
     );
