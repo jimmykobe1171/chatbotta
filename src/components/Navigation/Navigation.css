@@ -1,15 +1,8 @@
-/**
- * React Starter Kit (https://www.reactstarterkit.com/)
- *
- * Copyright © 2014-present Kriasoft, LLC. All rights reserved.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE.txt file in the root directory of this source tree.
- */
 
 .root {
   float: right;
   margin: 6px 0 0;
+  position: relative;
 }
 
 .link {
@@ -29,33 +22,9 @@
   color: #afafaf;
 }
 
-.logInPage {
-  width: 280px;
-  height: 280px;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 3px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin: -100px 0 0 -150px;
-  background-color: #fff;
-  z-index: 15;
-  color: #828282;
-}
-
-.signUpPage {
-  width: 280px;
-  height: 280px;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 3px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin: -100px 0 0 -150px;
-  background-color: #fff;
-  z-index: 15;
-  color: #828282;
-}
+/*.logInButton{
+  float: right;
+}*/
 
 .spacer {
   color: rgba(255, 255, 255, 0.3);

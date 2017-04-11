@@ -3,8 +3,8 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import AutoComplete from 'material-ui/AutoComplete';
 import MenuItem from 'material-ui/MenuItem';
-// import RaisedButton from 'material-ui/RaisedButton';
-// import s from './Navigation.css';
+import RaisedButton from 'material-ui/RaisedButton';
+import s from './SignUpModal.css';
 
 const customContentStyle = {
   width: '380px',
@@ -47,7 +47,7 @@ const AutoCompleteExampleDataSource = () => (
  */
 export default class SignUpModal extends React.Component {
   state = {
-    open: true,
+    open: false,
   };
 
   handleOpen = () => {
@@ -75,7 +75,9 @@ export default class SignUpModal extends React.Component {
 
     return (
       <div>
+        <RaisedButton label="Sign up" onClick={this.handleOpen} primary />
         <Dialog
+          className={s.signUpPage}
           title="chatbot TA"
           actions={actions}
           modal

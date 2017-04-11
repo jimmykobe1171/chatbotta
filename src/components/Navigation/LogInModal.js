@@ -3,7 +3,8 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
-
+import RaisedButton from 'material-ui/RaisedButton';
+import s from './LogInModal.css';
 
 const customContentStyle = {
   width: '380px',
@@ -34,7 +35,7 @@ const CheckRemember = () => (
  */
 export default class LogInModal extends React.Component {
   state = {
-    open: true,
+    open: false,
   };
 
   handleOpen = () => {
@@ -61,9 +62,15 @@ export default class LogInModal extends React.Component {
     ];
 
     return (
-      <div>
+      <div className={s.button}>
+        <RaisedButton
+          label="Log in"
+          onClick={this.handleOpen}
+          labelColor="#AFAFAF"
+        />
         <Dialog
           title="chatbot TA"
+          className={s.logInPage}
           actions={actions}
           modal
           contentStyle={customContentStyle}
