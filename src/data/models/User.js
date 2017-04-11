@@ -30,7 +30,7 @@ const User = Model.define('User', {
     unique: true,
     allowNull: false,
   },
-  password_hash: {
+  passwordHash: {
     type: DataType.STRING,
     allowNull: false,
   },
@@ -40,7 +40,7 @@ const User = Model.define('User', {
       this.setDataValue('password', val); // Remember to set the data value, otherwise it won't be validated
       // generate hash
       const hash = bcrypt.hashSync(val, saltRounds);
-      this.setDataValue('password_hash', hash);
+      this.setDataValue('passwordHash', hash);
     },
     validate: {
       isLongEnough(val) {
@@ -60,7 +60,7 @@ const User = Model.define('User', {
   ],
   instanceMethods: {
     authenticate(password) {
-      const hash = this.getDataValue('password_hash');
+      const hash = this.getDataValue('passwordHash');
       return bcrypt.compareSync(password, hash);
     },
   },

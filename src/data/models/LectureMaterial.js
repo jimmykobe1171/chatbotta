@@ -11,7 +11,7 @@ import DataType from 'sequelize';
 import Model from '../sequelize';
 
 
-const School = Model.define('School', {
+const LectureMaterial = Model.define('LectureMaterial', {
   id: {
     type: DataType.UUID,
     defaultValue: DataType.UUIDV1,
@@ -22,10 +22,17 @@ const School = Model.define('School', {
     type: DataType.STRING,
     allowNull: false,
   },
+  description: {
+    type: DataType.TEXT,
+    allowNull: true,
+  },
 }, {
   indexes: [
         { fields: ['id', 'name'] },
   ],
+  instanceMethods: {
+
+  },
 });
 
-export default School;
+export default LectureMaterial;
