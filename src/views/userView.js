@@ -10,7 +10,7 @@ const router = express.Router();
  * get users list
  */
 router.get('/users/', isAuthenticated, (req, res) => {
-  res.json([{id:1, email: 'jimmy@test.com'}]);
+  res.json([{ id: 1, email: 'jimmy@test.com' }]);
     // res.end();
     // res.status(400).json({error: 'invalid data'})
 });
