@@ -62,7 +62,7 @@ export default class LogInModal extends React.Component {
     ];
 
     return (
-      <div className={s.button}>
+      <div>
         <RaisedButton
           label="Log in"
           onClick={this.handleOpen}
