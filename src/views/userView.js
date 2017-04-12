@@ -10,7 +10,7 @@ const router = express.Router();
  * get users list
  */
 router.get('/users/', isAuthenticated, (req, res) => {
-  res.send('get users');
+  res.json([{id:1, email: 'jimmy@test.com'}]);
     // res.end();
     // res.status(400).json({error: 'invalid data'})
 });
@@ -47,7 +47,7 @@ router.post('/login/',
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
         // res.redirect('/users/' + req.user.username);
-      res.end();
+      res.json({});
     },
 );
 
@@ -56,7 +56,7 @@ router.post('/login/',
  */
 router.get('/logout/', isAuthenticated, (req, res) => {
   req.logout();
-  res.end();
+  res.json({});
 });
 
 
