@@ -11,10 +11,8 @@ import path from 'path';
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import expressJwt from 'express-jwt';
 import expressGraphQL from 'express-graphql';
 import expressSession from 'express-session';
-import jwt from 'jsonwebtoken';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
@@ -28,10 +26,10 @@ import models from './data/models';
 import schema from './data/schema';
 import routes from './routes';
 import assets from './assets.json'; // eslint-disable-line import/no-unresolved
-import { port, auth } from './config';
+import { port } from './config';
 import userView from './views/userView';
 import schoolView from './views/schoolView';
-import {User} from './data/models';
+import { User } from './data/models';
 
 
 const app = express();
