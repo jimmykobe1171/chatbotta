@@ -2,45 +2,35 @@ import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
-import RaisedButton from 'material-ui/RaisedButton';
-import s from './LogInModal.css';
-import ForgotPassword from './ForgotPassword';
+// import RaisedButton from 'material-ui/RaisedButton';
+// import s from './ForgotPassword.css';
 
 const customContentStyle = {
   width: '380px',
   maxWidth: 'none',
 };
 
-const LogInTextField = () => (
+const ResetPwTextField = () => (
   <div>
     <TextField
       hintText="email"
       fullWidth
-    /><br />
-    <TextField
-      hintText="password"
-      fullWidth
-    /><br />
+    />
   </div>
 );
 
-const CheckRemember = () => (
-  <Checkbox
-    label="Remember me"
-  />
-);
-
-/**
- * A modal dialog can only be closed by selecting one of the actions.
- */
-export default class LogInModal extends React.Component {
+export default class ForgotPassword extends React.Component {
   state = {
     open: false,
+    reset: true,
   };
 
   handleOpen = () => {
     this.setState({ open: true });
+  };
+
+  handleReset = () => {
+    this.setState({ reset: false });
   };
 
   handleClose = () => {
@@ -50,36 +40,32 @@ export default class LogInModal extends React.Component {
   render() {
     const actions = [
       <FlatButton
-        label="Cancel"
-        onClick={this.handleClose}
-        labelStyle={{ color: '#AFAFAF' }}
-      />,
-      <FlatButton
-        label="Submit"
+        label="reset password"
         primary
-        onClick={this.handleClose}
+        onClick={this.handleReset}
       />,
     ];
 
     return (
       <div>
-        <RaisedButton
-          label="Log in"
+        <FlatButton
+          label="forgot your password?"
           onClick={this.handleOpen}
-          labelColor="#AFAFAF"
+          primary
         />
         <Dialog
           title="chatbot TA"
-          className={s.logInPage}
           actions={actions}
           modal={false}
           contentStyle={customContentStyle}
           open={this.state.open}
           onRequestClose={this.handleClose}
         >
-          <LogInTextField />
-          <CheckRemember />
-          <ForgotPassword />
+          <p>Enter the email address you used to register for Chatbot TA.</p>
+          {(this.state.reset) ?
+            <ResetPwTextField />
+          : <div><p>Thanks! We just sent you an email with a link to set a
+          new password. Click on the link in the email to continue.</p></div>}
         </Dialog>
       </div>
     );
