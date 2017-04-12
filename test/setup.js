@@ -11,6 +11,7 @@
 
 process.env.NODE_ENV = 'test';
 process.env.DATABASE_URL = 'sqlite:test_database.sqlite';
+process.env.PORT = 3001;
 
 function noop() {
   return null;

@@ -1,6 +1,7 @@
 const express = require('express');
-const router = express.Router();
 
+
+const router = express.Router();
 
 router.get('/schools/', (req, res) => {
   res.send('get schools');
