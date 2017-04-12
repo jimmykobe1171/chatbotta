@@ -31,7 +31,7 @@ import assets from './assets.json'; // eslint-disable-line import/no-unresolved
 import { port, auth } from './config';
 import userView from './views/userView';
 import schoolView from './views/schoolView';
-import {User} from './data/models';
+import { User } from './data/models';
 
 
 const app = express();

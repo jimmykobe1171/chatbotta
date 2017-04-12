@@ -9,6 +9,7 @@
 
 import React from 'react';
 // import cx from 'classnames';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 // import RaisedButton from 'material-ui/RaisedButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -19,6 +20,7 @@ import Link from '../Link';
 import LogInModal from './LogInModal';
 import SignUpModal from './SignUpModal';
 
+injectTapEventPlugin();
 
 const muiTheme = getMuiTheme({
   borderRadius: 5,
