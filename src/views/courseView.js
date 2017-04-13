@@ -34,4 +34,15 @@ router.get('/courses/', (req, res) => {
   // })
 });
 
+router.get('/course/:courseId/', (req, res) => {
+  Course.findOne({
+    attributes: ['id', 'name', 'description'],
+    where: { id: req.params.courseId },
+  }).then((csr) => {
+    res.json(csr);
+  }).catch((err) => {
+    res.status(400).json({ error: err });
+  });
+});
+
 export default router;
