@@ -38,9 +38,9 @@ class Navigation extends React.Component {
           <Link className={s.link} to="/about">About</Link>
           <Link className={s.link} to="/contact">Contact</Link>
           <span className={s.spacer}> | </span>
-          <LogInModal />
+          <LogInModal className={s.logInButton} />
           <span className={s.spacer}>or</span>
-          <SignUpModal />
+          <SignUpModal className={s.signUpButton} />
         </div>
       </MuiThemeProvider>
     );
