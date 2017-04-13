@@ -57,4 +57,4 @@ function sync(...args) {
 }
 
 export default { sync };
-export { User, School, Course, Lecture, LectureMaterial };
+export { User, School, Course, Lecture, LectureMaterial, UserCourse };
