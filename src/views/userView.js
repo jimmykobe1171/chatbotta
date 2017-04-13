@@ -1,6 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import { isAuthenticated } from '../core/middleware';
+import { User } from '../data/models';
 
 
 const router = express.Router();
@@ -28,14 +29,34 @@ router.get('/user/:userId/', isAuthenticated, (req, res) => {
 router.post('/register/', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const school = req.body.school;
-  const courses = req.body.courses;
+  const school = req.body.school; // school id
+  const courses = req.body.courses; // list of course id
+  // console.log(email);
+  // console.log(password);
+  // console.log(school);
+  // console.log(courses);
   if (email && password && school) {
-    res.json({ status: 'success' });
+    // create user
+    User.create({
+      username: email,
+      email,
+      password,
+    })
+    .then((user) => {
+      user.setSchool(school)
+        .then(() => {
+          res.json({ userId: user.id });
+        })
+        .catch((err) => {
+          res.status(400).json({ error: err.message });
+        });
+    })
+    .catch((err) => {
+      res.status(400).json({ error: err.message });
+    });
   } else {
     res.status(400).json({ error: 'invalid data' });
   }
-  res.send('get users');
 });
 
 /*

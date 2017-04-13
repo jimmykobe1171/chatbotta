@@ -6,70 +6,99 @@ const assert = chai.assert;
 
 describe('Course Model', () => {
   beforeEach((done) => {
-    models.sync({ force: true }).then(() => {
+    models.sync({ force: true })
+    .then(() => {
       done();
-    }).catch((error) => {
-      done(error);
-    });
+    })
+    .catch(done);
   });
 
   it('should create Course correctly', (done) => {
     Course.create({
       name: 'course 1',
       description: 'course 1',
-    }).then(() => {
-      Course.findOne({ where: { name: 'course 1' } }).then(() => {
-        done();
-      }).catch(done);
-    }).catch(done);
+    })
+    .then(() => Course.findOne({ where: { name: 'course 1' } }))
+    .then(() => {
+      done();
+    })
+    .catch(done);
   });
 
   it('should add User to Course correctly', (done) => {
+    const dic = {};
     User.create({
       username: 'jimmy',
       email: 'jimmy@test.com',
       password: 'jimmy123',
-      type: 'student',
-    }).then((user) => {
-      Course.create({
+    })
+    .then((user) => {
+      dic.user = user;
+      return Course.create({
         name: 'course 1',
         description: 'course 1',
-      }).then((course) => {
-        course.hasUser(user).then((result) => {
-          assert.equal(result, false);
-          course.addUser(user).then(() => {
-            course.hasUser(user).then((result1) => {
-              assert.equal(result1, true);
-              done();
-            }).catch(done);
-          }).catch(done);
-        }).catch(done);
-      }).catch(done);
-    }).catch(done); // are you kidding me??? so called promise?
+      });
+    })
+    .then((course) => {
+      dic.course = course;
+      const user = dic.user;
+      return course.hasUser(user);
+    })
+    .then((result) => {
+      const course = dic.course;
+      const user = dic.user;
+      assert.equal(result, false);
+      return course.addUser(user, { joinType: 'student' });
+    })
+    .then(() => {
+      const course = dic.course;
+      const user = dic.user;
+      return course.hasUser(user);
+    })
+    .then((result) => {
+      assert.equal(result, true);
+      done();
+    })
+    .catch((error) => {
+      done(error);
+    });
   });
 
   it('should add Course to User correctly', (done) => {
+    const dic = {};
     User.create({
       username: 'jimmy',
       email: 'jimmy@test.com',
       password: 'jimmy123',
-      type: 'student',
-    }).then((user) => {
-      Course.create({
+    })
+    .then((user) => {
+      dic.user = user;
+      return Course.create({
         name: 'course 1',
         description: 'course 1',
-      }).then((course) => {
-        user.hasCourse(course).then((result) => {
-          assert.equal(result, false);
-          user.addCourse(course).then(() => {
-            user.hasCourse(course).then((result1) => {
-              assert.equal(result1, true);
-              done();
-            }).catch(done);
-          }).catch(done);
-        }).catch(done);
-      }).catch(done);
-    }).catch(done); // are you kidding me??? so called promise?
+      });
+    })
+    .then((course) => {
+      dic.course = course;
+      const user = dic.user;
+      return user.hasCourse(course);
+    })
+    .then((result) => {
+      const course = dic.course;
+      const user = dic.user;
+      assert.equal(result, false);
+      return user.addCourse(course, { joinType: 'student' });
+    })
+    .then(() => {
+      const course = dic.course;
+      const user = dic.user;
+      return user.hasCourse(course);
+    })
+    .then((result) => {
+      assert.equal(result, true);
+      done();
+    })
+    .catch(done);
   });
 
 });

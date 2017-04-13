@@ -7,6 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
+import DataType from 'sequelize';
 import sequelize from '../sequelize';
 import User from './User';
 import School from './School';
@@ -14,16 +15,26 @@ import Course from './Course';
 import Lecture from './Lecture';
 import LectureMaterial from './LectureMaterial';
 
-
+// define relationships
 School.hasMany(User);
+
+const UserCourse = sequelize.define('UserCourse', {
+  joinType: {
+    type: DataType.ENUM('student', 'ta', 'professor'),
+    allowNull: false,
+  },
+});
 Course.belongsToMany(User, {
-  through: 'UserCourse',
+  through: UserCourse,
 });
 User.belongsToMany(Course, {
-  through: 'UserCourse',
+  through: UserCourse,
 });
+
 Lecture.hasMany(LectureMaterial);
+
 Course.hasMany(Lecture);
+
 School.hasMany(Course);
 
 // User.hasMany(UserLogin, {
