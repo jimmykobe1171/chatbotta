@@ -1,7 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import { isAuthenticated } from '../core/middleware';
-import { User, School } from '../data/models';
+import { User, School, Course } from '../data/models';
 
 
 const router = express.Router();
@@ -11,9 +11,18 @@ const router = express.Router();
  * get users list
  */
 router.get('/users/', isAuthenticated, (req, res) => {
-  res.json([{ id: 1, email: 'jimmy@test.com' }]);
-    // res.end();
-    // res.status(400).json({error: 'invalid data'})
+  User.findAll({
+    attributes: ['id', 'email', 'username', 'SchoolId'],
+    include: [{
+        model: Course
+    }]
+  })
+  .then((users) => {
+    res.json(users);
+  })
+  .catch((err) => {
+    res.status(400).json({error: 'get users failed'});
+  });
 });
 
 /*
@@ -61,7 +70,15 @@ router.post('/register/', (req, res) => {
     })
     .then(() => {
       const user = dic.user;
-      return res.json({ userId: user.id });
+      // login new registered user
+      req.logIn(user, function(err) {
+        if (err) {
+            res.status(400).json({ error: 'login user failed' });
+        }
+        else {
+            res.json({ userId: user.id });
+        }
+      });
     })
     .catch((err) => {
       res.status(400).json({ error: 'create user failed' });
