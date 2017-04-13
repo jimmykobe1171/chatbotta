@@ -18,7 +18,7 @@ import routes from './routes';
 import schema from './data/schema';
 import models from './data/models';
 import { port } from './config';
-import { User } from './data/models';
+import { User, Course, School } from './data/models';
 import app from './app';
 
 
@@ -96,6 +96,18 @@ models.sync({ force: true }).catch(err => console.error(err.stack)).then(() => {
       username: 'jimmy',
       email: 'jimmy@test.com',
       password: 'jimmy123',
+    });
+    Course.create({
+      name: 'course 1',
+    });
+    Course.create({
+      name: 'course 2',
+    });
+    Course.create({
+      name: 'course 3',
+    });
+    School.create({
+      name: 'columbia',
     });
   });
 });

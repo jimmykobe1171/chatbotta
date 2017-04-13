@@ -12,12 +12,6 @@ import Model from '../sequelize';
 
 
 const LectureMaterial = Model.define('LectureMaterial', {
-  id: {
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV1,
-    primaryKey: true,
-    allowNull: false,
-  },
   name: {
     type: DataType.STRING,
     allowNull: false,

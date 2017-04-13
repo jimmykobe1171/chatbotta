@@ -1,7 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import { isAuthenticated } from '../core/middleware';
-import { User } from '../data/models';
+import { User, School } from '../data/models';
 
 
 const router = express.Router();
@@ -29,30 +29,42 @@ router.get('/user/:userId/', isAuthenticated, (req, res) => {
 router.post('/register/', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const school = req.body.school; // school id
+  const schoolId = req.body.school; // school id
   const courses = req.body.courses; // list of course id
-  // console.log(email);
-  // console.log(password);
-  // console.log(school);
-  // console.log(courses);
-  if (email && password && school) {
-    // create user
+  const courseIds = courses.map(x => x.id);
+  const joinTypes = courses.map(x => ({ joinType: x.joinType }));
+  if (email && password && schoolId) {
+        // create user
+    const dic = {};
     User.create({
       username: email,
       email,
       password,
     })
     .then((user) => {
-      user.setSchool(school)
-        .then(() => {
-          res.json({ userId: user.id });
-        })
-        .catch((err) => {
-          res.status(400).json({ error: err.message });
-        });
+      dic.user = user;
+      return School.findById(schoolId);
+    })
+    .then((school) => {
+        // set school to user
+      const user = dic.user;
+      return school.addUser(user);
+    })
+    .then(() => {
+        // set courses to user
+      const user = dic.user;
+      const allPromises = [];
+      for (let i = 0; i < courses.length; i++) {
+        allPromises.push(user.addCourse(courseIds[i], joinTypes[i]));
+      }
+      return Promise.all(allPromises);
+    })
+    .then(() => {
+      const user = dic.user;
+      return res.json({ userId: user.id });
     })
     .catch((err) => {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ error: 'create user failed' });
     });
   } else {
     res.status(400).json({ error: 'invalid data' });
