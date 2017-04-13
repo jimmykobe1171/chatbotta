@@ -9,13 +9,18 @@
 
 import React from 'react';
 // import cx from 'classnames';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
-import RaisedButton from 'material-ui/RaisedButton';
+// import RaisedButton from 'material-ui/RaisedButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import { blue300 } from 'material-ui/styles/colors';
 import s from './Navigation.css';
 import Link from '../Link';
+import LogInModal from './LogInModal';
+import SignUpModal from './SignUpModal';
+
+injectTapEventPlugin();
 
 const muiTheme = getMuiTheme({
   borderRadius: 5,
@@ -25,44 +30,6 @@ const muiTheme = getMuiTheme({
 }, { userAgent: 'all' });
 
 class Navigation extends React.Component {
-  constructor(props) {
-    super(props);
-    this.logIn = this.logIn.bind(this);
-    this.signUp = this.signUp.bind(this);
-    this.state = { logInPopUp: false, signUpPopUp: false };
-  }
-
-  logIn() {
-    this.setState({ logInPopUp: true });
-  }
-
-  signUp() {
-    this.setState({ signUpPopUp: true });
-  }
-
-  logInButtonNormal() {
-    return (
-      <RaisedButton label="Log in" onClick={this.logIn} labelColor="#AFAFAF" />
-    );
-  }
-
-  logInButtonDisabled() {
-    return (
-      <RaisedButton label="Log in" disabled />
-    );
-  }
-
-  signUpButtonNormal() {
-    return (
-      <RaisedButton label="Sign up" onClick={this.signUp} primary />
-    );
-  }
-
-  signUpButtonDisabled() {
-    return (
-      <RaisedButton label="Sign up" primary disabled />
-    );
-  }
 
   render() {
     return (
@@ -71,20 +38,9 @@ class Navigation extends React.Component {
           <Link className={s.link} to="/about">About</Link>
           <Link className={s.link} to="/contact">Contact</Link>
           <span className={s.spacer}> | </span>
-          {(this.state.logInPopUp) ? this.logInButtonDisabled()
-                                : this.logInButtonNormal()}
+          <LogInModal className={s.logInButton} />
           <span className={s.spacer}>or</span>
-          {(this.state.signUpPopUp) ? this.signUpButtonDisabled()
-                                : this.signUpButtonNormal()}
-
-          {(this.state.logInPopUp) ?
-            <div className={s.logInPage}>
-              <h1>log in</h1>
-            </div> : null }
-          {(this.state.signUpPopUp) ?
-            <div className={s.signUpPage}>
-              <h1>sign up</h1>
-            </div> : null }
+          <SignUpModal className={s.signUpButton} />
         </div>
       </MuiThemeProvider>
     );

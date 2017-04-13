@@ -10,7 +10,21 @@
 import sequelize from '../sequelize';
 import User from './User';
 import School from './School';
+import Course from './Course';
+import Lecture from './Lecture';
+import LectureMaterial from './LectureMaterial';
 
+
+School.hasMany(User);
+Course.belongsToMany(User, {
+  through: 'UserCourse',
+});
+User.belongsToMany(Course, {
+  through: 'UserCourse',
+});
+Lecture.hasMany(LectureMaterial);
+Course.hasMany(Lecture);
+School.hasMany(Course);
 
 // User.hasMany(UserLogin, {
 //   foreignKey: 'userId',
@@ -32,5 +46,4 @@ function sync(...args) {
 }
 
 export default { sync };
-export { User };
-export { School };
+export { User, School, Course, Lecture, LectureMaterial };
