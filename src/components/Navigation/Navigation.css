@@ -1,4 +1,5 @@
 .root {
+  display: flex;
   float: right;
   margin: 6px 0 0;
 }
@@ -33,7 +34,6 @@
   left: 200px;
   position: absolute;
 }
-
 
 .spacer {
   color: rgba(255, 255, 255, 0.3);
