@@ -14,7 +14,11 @@ router.get('/users/', isAuthenticated, (req, res) => {
   User.findAll({
     attributes: ['id', 'email', 'username', 'SchoolId'],
     include: [{
-        model: Course
+        model: Course,
+        attributes: ['id', 'name', 'description'],
+        through: {
+            attributes: ['joinType']
+        }
     }]
   })
   .then((users) => {
