@@ -50,10 +50,10 @@ const User = Model.define('User', {
       },
     },
   },
-  type: {
-    type: DataType.ENUM('student', 'ta', 'professor'),
-    allowNull: false,
-  },
+  // type: {
+  //   type: DataType.ENUM('student', 'ta', 'professor'),
+  //   allowNull: false,
+  // },
 }, {
   indexes: [
         { fields: ['email'] },

@@ -96,7 +96,6 @@ models.sync({ force: true }).catch(err => console.error(err.stack)).then(() => {
       username: 'jimmy',
       email: 'jimmy@test.com',
       password: 'jimmy123',
-      type: 'student',
     });
   });
 });
