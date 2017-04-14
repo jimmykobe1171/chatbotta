@@ -19,7 +19,7 @@ export default {
   action() {
     return {
       title,
-      component: <Dashboard title="Jimmy" />,
+      component: <Dashboard />,
     };
   },
 

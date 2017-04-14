@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import AppBar from 'material-ui/AppBar';
-import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import Drawer from 'material-ui/Drawer';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MenuItem from 'material-ui/MenuItem';
@@ -27,10 +26,6 @@ class DashboardHeader extends React.Component {
     this.state = { open: false };
   }
 
-  getChildContext() {
-    return { muiTheme: getMuiTheme(baseTheme) };
-  }
-
   handleToggle = () => {
     this.setState({ open: !this.state.open });
   }
@@ -49,8 +44,8 @@ class DashboardHeader extends React.Component {
             open={this.state.open}
             onRequestChange={open => this.setState({ open })}
           >
-            <MenuItem>Fake Class 1</MenuItem>
-            <MenuItem>Fake Class 2</MenuItem>
+            <MenuItem>Advanced Software Engineering</MenuItem>
+            <MenuItem>Machine Learning</MenuItem>
           </Drawer>
         </div>
       </MuiThemeProvider>

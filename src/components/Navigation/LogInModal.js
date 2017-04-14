@@ -3,8 +3,10 @@ import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import s from './LogInModal.css';
 import ForgotPassword from './ForgotPassword';
+import history from '../../core/history';
 
 const customContentStyle = {
   width: '380px',
@@ -59,55 +61,63 @@ export default class LogInModal extends React.Component {
         email: this.state.email,
         password: this.state.password,
       }),
-      redirect: '/dashboard',
-    }).then((response) => {
-      if (response.status >= 200 && response.status < 300) {
-        console.log('LOGIN SUCCESS', response);
-        window.location.href = './dashboard';
-      } else {
-        const error = new Error(response.statusText);
-        error.response = response;
-        throw error;
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
       }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
     })
-      .then(response => response.json())
+      .then((resp) => {
+        console.log('LOGIN SUCCESS', resp);
+        history.push({
+          pathname: '/dashboard',
+          state: {
+            username: resp.username,
+            courses: resp.courses,
+          },
+        });
+      })
       .catch(e => e);
   }
 
   render() {
+    const dialogActions = [
+      <FlatButton onClick={this.handleLoginSubmit} label="Sign In" />,
+    ];
+
     return (
       <div>
         <RaisedButton
           label="Log in"
           onClick={this.handleOpen}
-          labelColor="#AFAFAF"
+          labelColor="#afafaf"
         />
         <Dialog
           title="Chatbot TA"
+          actions={dialogActions}
           className={s.logInPage}
           modal={false}
           contentStyle={customContentStyle}
           open={this.state.open}
           onRequestClose={this.handleClose}
         >
-          <form onSubmit={this.handleLoginSubmit}>
-            <TextField
-              hintText="email"
-              value={this.state.email}
-              onChange={this.handleEmailChange}
-              fullWidth
-            /><br />
-            <TextField
-              hintText="password"
-              type="password"
-              value={this.state.password}
-              onChange={this.handlePasswordChange}
-              fullWidth
-            /><br />
-            <CheckRemember />
-            <ForgotPassword />
-            <button type="submit">Sign In</button>
-          </form>
+          <TextField
+            hintText="email"
+            value={this.state.email}
+            onChange={this.handleEmailChange}
+            fullWidth
+          />
+          <TextField
+            hintText="password"
+            type="password"
+            value={this.state.password}
+            onChange={this.handlePasswordChange}
+            fullWidth
+          />
+          <CheckRemember />
+          <ForgotPassword />
         </Dialog>
       </div>
     );
