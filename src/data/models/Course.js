@@ -18,6 +18,7 @@ const Course = Model.define('Course', {
   },
   description: {
     type: DataType.TEXT,
+    defaultValue: '',
     allowNull: true,
   },
 }, {
