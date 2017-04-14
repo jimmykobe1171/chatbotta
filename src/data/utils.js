@@ -48,7 +48,7 @@ function loadFixtures() {
   for (let i = 0; i < usersData.length; i++) {
     newUsersPromises.push(User.create(usersData[i]));
   }
-  Promise.all(newUsersPromises)
+  return Promise.all(newUsersPromises)
   .then((newUsers) => {
     users = newUsers;
     // create courses
