@@ -1,30 +1,28 @@
 import chai from 'chai';
 import request from 'supertest';
-import models, { User } from '../../src/data/models';
+import models, { User, Course, School } from '../../src/data/models';
 import app from '../../src/app';
 
 
-// const assert = chai.assert;
+const assert = chai.assert;
 
 /*
  * get users list
  */
 describe('GET /api/users/', () => {
   beforeEach((done) => {
-    models.sync({ force: true }).then(() => {
-      User.create({
+    models.sync({ force: true })
+    .then(() => {
+      return User.create({
         username: 'jimmy',
         email: 'jimmy@test.com',
         password: 'jimmy123',
-        type: 'student',
-      })
-      .then(() => {
-        done();
-      })
-      .catch(done);
-    }).catch((error) => {
-      done(error);
-    });
+      });
+    })
+    .then(() => {
+      done();
+    })
+    .catch(done);
   });
 
   it('should respond 401 unautherized without login', (done) => {
@@ -59,20 +57,18 @@ describe('GET /api/users/', () => {
  */
 describe('GET /api/login/', () => {
   beforeEach((done) => {
-    models.sync({ force: true }).then(() => {
-      User.create({
+    models.sync({ force: true })
+    .then(() => {
+      return User.create({
         username: 'jimmy',
         email: 'jimmy@test.com',
         password: 'jimmy123',
-        type: 'student',
-      })
-      .then(() => {
-        done();
-      })
-      .catch(done);
-    }).catch((error) => {
-      done(error);
-    });
+      });
+    })
+    .then(() => {
+      done();
+    })
+    .catch(done);
   });
 
   it('should respond 401 unautherized with wrong email', (done) => {
@@ -107,20 +103,18 @@ describe('GET /api/login/', () => {
  */
 describe('GET /api/logout/', () => {
   beforeEach((done) => {
-    models.sync({ force: true }).then(() => {
-      User.create({
+    models.sync({ force: true })
+    .then(() => {
+      return User.create({
         username: 'jimmy',
         email: 'jimmy@test.com',
         password: 'jimmy123',
-        type: 'student',
-      })
-      .then(() => {
-        done();
-      })
-      .catch(done);
-    }).catch((error) => {
-      done(error);
-    });
+      });
+    })
+    .then(() => {
+      done();
+    })
+    .catch(done);
   });
 
   it('should respond 401 unautherized without login', (done) => {
@@ -148,5 +142,54 @@ describe('GET /api/logout/', () => {
       }
     });
   });
+});
 
+
+/*
+ * user register
+ */
+describe('POST /api/register/', () => {
+  beforeEach((done) => {
+    models.sync({ force: true })
+    .then(() => {
+      const allPromises = [];
+      for (let i=0; i<3; i++) {
+        allPromises.push(Course.create({name: 'course ' + (i+1)}));
+      }
+      allPromises.push(School.create({name: 'columbia'}));
+      return Promise.all(allPromises);
+    })
+    .then(() => {
+      done();
+    })
+    .catch(done);
+  });
+
+  it('should respond 200', (done) => {
+    const agent = request.agent(app);
+    agent
+    .post('/api/register/')
+    .send(
+      { 
+        email: 'jimmy@test.com',
+        password: 'jimmy123',
+        school: 1,
+        courses: [
+          {
+            id: 1,
+            joinType: 'student'
+          },
+          {
+            id: 2,
+            joinType: 'ta'
+          }
+        ]
+      }
+    )
+    .expect('Content-Type', /json/)
+    .expect((res) => {
+      assert.equal(res.body.userId, 1);
+    })
+    .expect(200, done);
+  });
 });

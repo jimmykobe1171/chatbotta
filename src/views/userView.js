@@ -1,7 +1,7 @@
 import express from 'express';
 import passport from 'passport';
 import { isAuthenticated } from '../core/middleware';
-import { User } from '../data/models';
+import { User, School, Course } from '../data/models';
 
 
 const router = express.Router();
@@ -11,9 +11,22 @@ const router = express.Router();
  * get users list
  */
 router.get('/users/', isAuthenticated, (req, res) => {
-  res.json([{ id: 1, email: 'jimmy@test.com' }]);
-    // res.end();
-    // res.status(400).json({error: 'invalid data'})
+  User.findAll({
+    attributes: ['id', 'email', 'username', 'SchoolId'],
+    include: [{
+        model: Course,
+        attributes: ['id', 'name', 'description'],
+        through: {
+            attributes: ['joinType']
+        }
+    }]
+  })
+  .then((users) => {
+    res.json(users);
+  })
+  .catch((err) => {
+    res.status(400).json({error: 'get users failed'});
+  });
 });
 
 /*
@@ -29,30 +42,50 @@ router.get('/user/:userId/', isAuthenticated, (req, res) => {
 router.post('/register/', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const school = req.body.school; // school id
+  const schoolId = req.body.school; // school id
   const courses = req.body.courses; // list of course id
-  // console.log(email);
-  // console.log(password);
-  // console.log(school);
-  // console.log(courses);
-  if (email && password && school) {
-    // create user
+  const courseIds = courses.map(x => x.id);
+  const joinTypes = courses.map(x => ({ joinType: x.joinType }));
+  if (email && password && schoolId) {
+        // create user
+    const dic = {};
     User.create({
       username: email,
       email,
       password,
     })
     .then((user) => {
-      user.setSchool(school)
-        .then(() => {
-          res.json({ userId: user.id });
-        })
-        .catch((err) => {
-          res.status(400).json({ error: err.message });
-        });
+      dic.user = user;
+      return School.findById(schoolId);
+    })
+    .then((school) => {
+        // set school to user
+      const user = dic.user;
+      return school.addUser(user);
+    })
+    .then(() => {
+        // set courses to user
+      const user = dic.user;
+      const allPromises = [];
+      for (let i = 0; i < courses.length; i++) {
+        allPromises.push(user.addCourse(courseIds[i], joinTypes[i]));
+      }
+      return Promise.all(allPromises);
+    })
+    .then(() => {
+      const user = dic.user;
+      // login new registered user
+      req.logIn(user, function(err) {
+        if (err) {
+            res.status(400).json({ error: 'login user failed' });
+        }
+        else {
+            res.json({ userId: user.id });
+        }
+      });
     })
     .catch((err) => {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ error: 'create user failed' });
     });
   } else {
     res.status(400).json({ error: 'invalid data' });
