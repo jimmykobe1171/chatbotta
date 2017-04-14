@@ -13,7 +13,14 @@ function getUserLoginData(user) {
         username: user.username,
         courses: []
     };
-    return user.getSchool()
+    return School.findById(user.SchoolId)
+    // User.findById(user.id)
+    // .then((user) => {
+    //     console.log(user.getSchool);
+    //     console.log(user.getCourses);
+
+    //     return user.getSchool();
+    // })
     .then((school) => {
         data.schoolId = school.id;
         data.schoolName = school.name;
