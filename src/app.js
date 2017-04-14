@@ -12,6 +12,9 @@ import errorPageStyle from './routes/error/ErrorPage.css';
 import passport from './core/passport';
 import userView from './views/userView';
 import schoolView from './views/schoolView';
+import courseView from './views/courseView';
+import lectureView from './views/lectureView';
+import lectureMaterialView from './views/lectureMaterialView';
 
 
 const app = express();
@@ -39,6 +42,9 @@ app.use(passport.session());
 // -----------------------------------------------------------------------------
 app.use('/api', userView);
 app.use('/api', schoolView);
+app.use('/api', courseView);
+app.use('/api', lectureView);
+app.use('/api', lectureMaterialView);
 
 //
 // Error handling
