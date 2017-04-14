@@ -20,6 +20,7 @@ const LogInTextField = () => (
     /><br />
     <TextField
       hintText="password"
+      type="password"
       fullWidth
     /><br />
   </div>
@@ -57,30 +58,32 @@ export default class LogInModal extends React.Component {
       <FlatButton
         label="Submit"
         primary
-        onClick={this.handleClose}
+        type="submit"
       />,
     ];
 
     return (
       <div>
-        <RaisedButton
-          label="Log in"
-          onClick={this.handleOpen}
-          labelColor="#AFAFAF"
-        />
-        <Dialog
-          title="chatbot TA"
-          className={s.logInPage}
-          actions={actions}
-          modal={false}
-          contentStyle={customContentStyle}
-          open={this.state.open}
-          onRequestClose={this.handleClose}
-        >
-          <LogInTextField />
-          <CheckRemember />
-          <ForgotPassword />
-        </Dialog>
+        <form method="post">
+          <RaisedButton
+            label="Log in"
+            onClick={this.handleOpen}
+            labelColor="#AFAFAF"
+          />
+          <Dialog
+            title="Chatbot TA"
+            className={s.logInPage}
+            actions={actions}
+            modal={false}
+            contentStyle={customContentStyle}
+            open={this.state.open}
+            onRequestClose={this.handleClose}
+          >
+            <LogInTextField />
+            <CheckRemember />
+            <ForgotPassword />
+          </Dialog>
+        </form>
       </div>
     );
   }
