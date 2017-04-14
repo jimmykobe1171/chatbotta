@@ -7,28 +7,21 @@ import { User, School, Course } from '../data/models';
 const router = express.Router();
 
 function getUserLoginData(user) {
-    return User.findById(user.id, {
-        attributes: ['id', 'email', 'username', 'SchoolId'],
-        include: [{
-            model: Course,
-            // as: 'courses',
-            attributes: ['id', 'name', 'description'],
-            through: {
-                attributes: ['joinType']
-            }
-        }]
+    const data = {
+        userId: user.id,
+        email: user.email,
+        username: user.username,
+        courses: []
+    };
+    return user.getSchool()
+    .then((school) => {
+        data.schoolId = school.id;
+        data.schoolName = school.name;
+        return user.getCourses();
     })
-    .then((foundUser) => {
-        // console.log(foundUser);
-        const data = {
-            userId: foundUser.id,
-            email: foundUser.email,
-            username: foundUser.username,
-            school: foundUser.SchoolId,
-            courses: []
-        }
-        for (let i=0; i<foundUser.Courses.length; i++) {
-            const course = foundUser.Courses[i];
+    .then((courses) => {
+        for (let i=0; i<courses.length; i++) {
+            const course = courses[i];
             const courseData = {
                 id: course.id,
                 name: course.name,
@@ -39,6 +32,38 @@ function getUserLoginData(user) {
         return data;
     });
 }
+
+    // return User.findById(user.id, {
+    //     attributes: ['id', 'email', 'username', 'SchoolId'],
+    //     include: [{
+    //         model: Course,
+    //         // as: 'courses',
+    //         attributes: ['id', 'name', 'description'],
+    //         through: {
+    //             attributes: ['joinType']
+    //         }
+    //     }]
+    // })
+    // .then((foundUser) => {
+    //     // console.log(foundUser);
+    //     const data = {
+    //         userId: foundUser.id,
+    //         email: foundUser.email,
+    //         username: foundUser.username,
+    //         school: foundUser.SchoolId,
+    //         courses: []
+    //     }
+    //     for (let i=0; i<foundUser.Courses.length; i++) {
+    //         const course = foundUser.Courses[i];
+    //         const courseData = {
+    //             id: course.id,
+    //             name: course.name,
+    //             joinType: course.UserCourse.joinType
+    //         }
+    //         data.courses.push(courseData);
+    //     }
+    //     return data;
+    // });
 
 /*
  * get users list
