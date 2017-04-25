@@ -2,4 +2,34 @@
   border-radius: 3px;
 }
 
-/***************************************************************************************************/
+span.error {
+  color: #e55a5d;
+}
+
+.dialogActionButton {
+  margin: 0 15px 15px 0;
+}
+
+.banner {
+  background-color: rgb(100, 181, 246);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  margin: -24px -24px 10px -24px;
+  padding: 10px;
+}
+
+.bannerTitle,
+.bannerSubtitle {
+  text-align: center;
+}
+
+.bannerTitle {
+  color: white;
+  font-size: 36px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.bannerSubtitle {
+  color: rgba(0, 0, 0, 0.5);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}

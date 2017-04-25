@@ -18,7 +18,8 @@ const muiTheme = getMuiTheme({
 
 class DashboardHeader extends React.Component {
   static propTypes = {
-    title: PropTypes.string.isRequired,
+    courses: PropTypes.shape.isRequired,
+    username: PropTypes.string.isRequired,
   }
 
   constructor(props, context) {
@@ -36,7 +37,7 @@ class DashboardHeader extends React.Component {
         <div className={s.root}>
           <AppBar
             isInitiallyOpen={false}
-            title={this.props.title}
+            title={this.props.username}
             onLeftIconButtonTouchTap={this.handleToggle}
           />
           <Drawer
@@ -44,8 +45,7 @@ class DashboardHeader extends React.Component {
             open={this.state.open}
             onRequestChange={open => this.setState({ open })}
           >
-            <MenuItem>Advanced Software Engineering</MenuItem>
-            <MenuItem>Machine Learning</MenuItem>
+            {this.props.courses.map(course => <MenuItem>{course.name}</MenuItem>)}
           </Drawer>
         </div>
       </MuiThemeProvider>

@@ -37,7 +37,10 @@ class Dashboard extends React.Component {
   render() {
     return (
       <div>
-        <DashboardHeader title="Jimmy" />
+        <DashboardHeader
+          username={history.state.state.username}
+          courses={history.state.state.courses}
+        />
         <MuiThemeProvider muiTheme={muiTheme}>
           <Paper style={largePaperStyle} zDepth={4}>
             <Paper style={smallPaperStyle} zDepth={2} />

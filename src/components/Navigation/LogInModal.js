@@ -1,11 +1,9 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
 import TextField from 'material-ui/TextField';
-import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
-import FlatButton from 'material-ui/FlatButton';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './LogInModal.css';
-import ForgotPassword from './ForgotPassword';
 import history from '../../core/history';
 
 const customContentStyle = {
@@ -13,22 +11,20 @@ const customContentStyle = {
   maxWidth: 'none',
 };
 
-const CheckRemember = () => (
-  <Checkbox
-    label="Remember me"
-  />
-);
-
-/**
- * A modal dialog can only be closed by selecting one of the actions.
- */
-export default class LogInModal extends React.Component {
+class LogInModal extends React.Component {
   state = {
-    open: false,
-    email: '',
-    password: '',
     data: [],
+    email: '',
+    errorInvalidCred: false,
+    formValid: false,
+    open: false,
+    password: '',
   };
+
+  validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  }
 
   handleOpen = () => {
     this.setState({ open: true });
@@ -41,13 +37,21 @@ export default class LogInModal extends React.Component {
   handleEmailChange = (e) => {
     this.setState({
       email: e.target.value,
+      formValid: e.target.value !== '' &&
+          this.validateEmail(e.target.value) &&
+          this.state.password !== '',
     });
+    this.setState({ errorInvalidCred: false });
   }
 
   handlePasswordChange = (e) => {
     this.setState({
       password: e.target.value,
+      formValid: e.target.value !== '' &&
+          this.validateEmail(this.state.email) &&
+          this.state.email !== '',
     });
+    this.setState({ errorInvalidCred: false });
   }
 
   handleLoginSubmit = () => {
@@ -70,32 +74,41 @@ export default class LogInModal extends React.Component {
       throw error;
     })
       .then((resp) => {
-        console.log('LOGIN SUCCESS', resp);
+        console.log('LogInModal - handleLoginSubmit -  SUCCESS', resp);
         history.push({
           pathname: '/dashboard',
           state: {
-            username: resp.username,
             courses: resp.courses,
+            username: resp.username,
           },
         });
       })
-      .catch(e => e);
+      .catch((e) => {
+        console.log('LogInModal - handleLoginSubmit - FAIL', e);
+        this.setState({ errorInvalidCred: true });
+      });
   }
 
   render() {
     const dialogActions = [
-      <FlatButton onClick={this.handleLoginSubmit} label="Sign In" />,
+      this.state.formValid ?
+        <RaisedButton
+          className={s.dialogActionButton}
+          label="Sign In"
+          onClick={this.handleLoginSubmit}
+          primary
+        /> :
+          null,
     ];
 
     return (
       <div>
         <RaisedButton
-          label="Log in"
+          label="Sign In"
           onClick={this.handleOpen}
           labelColor="#afafaf"
         />
         <Dialog
-          title="Chatbot TA"
           actions={dialogActions}
           className={s.logInPage}
           modal={false}
@@ -103,23 +116,34 @@ export default class LogInModal extends React.Component {
           open={this.state.open}
           onRequestClose={this.handleClose}
         >
+          <div className={s.banner}>
+            <div className={s.bannerTitle}>
+              <span>Chatbot TA</span>
+            </div>
+            <div className={s.bannerSubtitle}>
+              <span>Sign in with the TREMENDOUS learning platform</span>
+            </div>
+          </div>
           <TextField
-            hintText="email"
+            hintText="Email"
             value={this.state.email}
             onChange={this.handleEmailChange}
             fullWidth
           />
           <TextField
-            hintText="password"
+            hintText="Password"
             type="password"
             value={this.state.password}
             onChange={this.handlePasswordChange}
             fullWidth
           />
-          <CheckRemember />
-          <ForgotPassword />
+          {this.state.errorInvalidCred ?
+            <span className={s.error}>Invalid username or password.</span> :
+              null}
         </Dialog>
       </div>
     );
   }
 }
+
+export default withStyles(s)(LogInModal);

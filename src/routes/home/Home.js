@@ -17,7 +17,7 @@ class Home extends React.Component {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <img src={robotImg} width="350" height="380" alt="robots-start" />
+          <img className={s.robotImg} src={robotImg} alt="robots-start" />
           <div className={s.passage}>
             <h1>Meet the bots that will make learning GREAT again</h1>
             <p>Studies that looked at delayed vs. immediate feedback discovered that participants
