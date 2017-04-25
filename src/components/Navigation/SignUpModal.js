@@ -1,102 +1,39 @@
 import React from 'react';
+import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
-import AutoComplete from 'material-ui/AutoComplete';
-import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import RadioButton from 'material-ui/RadioButton';
+import AutoCompleteSchool from './AutoCompleteSchool';
 import s from './SignUpModal.css';
 
-/**
- * A modal dialog can only be closed by selecting one of the actions.
- */
-export default class SignUpModal extends React.Component {
+const SignUpModes = {
+  SCHOOL: 1,
+  COURSES: 2,
+  SUMMARY: 3,
+};
+
+class SignUpModal extends React.Component {
   constructor(props) {
     super(props);
-    // this.onUpdateInput = this.onUpdateInput.bind(this);
     this.state = {
+      mode: SignUpModes.SCHOOL,
       open: false,
-      student: true,
-      ta: false,
-      faculty: false,
-      dataSource: [{ text: 'Columbia University',
-        value: (
-          <MenuItem
-            primaryText={'Columbia University'}
-          />
-              ),
-      },
-      { text: 'NYU',
-        value: (
-          <MenuItem
-            primaryText={'NYU'}
-          />
-              ),
-      },
-      ],
-      courseSource: [{ text: 'Advanced Software Engineering',
-        value: (
-          <MenuItem
-            primaryText={'Advanced Software Engineering'}
-          />
-              ),
-      },
-      { text: 'Machine Learning',
-        value: (
-          <MenuItem
-            primaryText={'Machine Learnings'}
-          />
-              ),
-      },
-      { text: 'Natural Language Processing',
-        value: (
-          <MenuItem
-            primaryText={'Natural Language Processing'}
-          />
-              ),
-      },
-      ],
+      school: null,
     };
   }
 
-  // onUpdateInput(inputValue) {
-    // const self = this;
-    // self.performSearch(inputValue);
-  // }
+  onSelectSchool = (school) => {
+    this.setState({
+      mode: SignUpModes.COURSES,
+      school,
+    });
+  }
 
-  // performSearch(inputValue) {
-  //   if (inputValue !== '') {
-  //     fetch('/api/schools', {
-  //       method: 'get',
-  //     }).then((resp) => {
-  //       if (resp.status >= 200 && resp.status < 400) {
-  //         return resp.json();
-  //       }
-  //       const error = new Error(resp.statusText);
-  //       error.response = resp;
-  //       throw error;
-  //     })
-  //       .then((resp) => {
-  //         const schools = [];
-  //         for (school of resp) {
-  //           schools.push({
-  //             text: school.name,
-  //             value: (
-  //               <MenuItem
-  //                 primaryText={school.name}
-  //               />
-  //             ),
-  //           });
-  //         }
-  //         console.log('YES', schools);
-  //         self.setState({
-  //           dataSource: schools,
-  //         });
-  //       })
-  //       .catch(e => e);
-  //   }
-  // }
-
+  goEditSchool = () => {
+    this.setState({
+      mode: SignUpModes.SCHOOL,
+    });
+  }
 
   handleOpen = () => {
     this.setState({ open: true });
@@ -107,18 +44,33 @@ export default class SignUpModal extends React.Component {
   }
 
   render() {
+    /* TODO:
+     * 1. Add onClick actions to the RaisedButtons;
+     * 2. Think of a better and less nasty way to write the following logic to
+     *    avoid the linter's nested-ternary check;
+     */
+    const firstButtonLogic =
+        this.state.mode === SignUpModes.COURSES ?
+          (<RaisedButton
+            className={s.leftButton}
+            label="Add Course"
+            labelColor="#afafaf"
+          />) : null;
+
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary
-        onClick={this.handleClose}
-      />,
-      <FlatButton
-        label="Submit"
-        primary
-        disabled
-        onClick={this.handleClose}
-      />,
+      this.state.mode === SignUpModes.SCHOOL ?
+        <FlatButton
+          label="Next, you will add your classes"
+          primary
+          disabled
+        /> : firstButtonLogic,
+      this.state.mode === SignUpModes.COURSES ?
+        <RaisedButton
+          className={s.actionButton}
+          label="Join Courses"
+          primary
+        /> :
+          null,
     ];
 
     const customContentStyle = {
@@ -126,55 +78,71 @@ export default class SignUpModal extends React.Component {
       maxWidth: 'none',
     };
 
-    const AutoCompleteSchoolDataSource = () => (
-      <div>
-        <AutoComplete
-          hintText="e.g. My University"
-          filter={AutoComplete.caseInsensitiveFilter}
-          dataSource={this.state.dataSource}
-          onUpdateInput={this.onUpdateInput}
-          fullWidth
-        />
-      </div>
-    );
-
-    const AutoCompleteCourseDataSource = () => (
-      <div>
-        <AutoComplete
-          hintText="e.g. My Course"
-          filter={AutoComplete.caseInsensitiveFilter}
-          dataSource={this.state.courseSource}
-          fullWidth
-        />
-      </div>
-    );
-
     return (
       <div>
         <RaisedButton label="Sign up" onClick={this.handleOpen} primary />
         <Dialog
           className={s.signUpPage}
-          title="Chatbot TA"
           actions={actions}
-          modal
+          modal={false}
           contentStyle={customContentStyle}
           open={this.state.open}
+          onRequestClose={this.handleClose}
         >
-          <div>
-            <h3>Select your school</h3>
-            <p>Search for your school below.</p>
-            <AutoCompleteSchoolDataSource />
+          <div className={s.banner}>
+            <div className={s.bannerTitle}>
+              <span>Chatbot TA</span>
+            </div>
+            <div className={s.bannerSubtitle}>
+              <span>Sign up to start WINNING with our bots</span>
+            </div>
           </div>
-          <div>
-            <h3>Select your course</h3>
-            <p>Search for your course below.</p>
-            <AutoCompleteCourseDataSource />
-          </div>
-          <RadioButton label="Student" value={this.state.student} />
-          <RadioButton label="TA" value={this.state.ta} />
-          <RadioButton label="Faculty" value={this.state.faculty} />
+
+          {
+            // Select school
+          }
+          {this.state.mode === SignUpModes.SCHOOL ?
+              (<div>
+                <h3 className={s.promptTitle}>Select your school</h3>
+                <span>Search for your courses below.</span>
+                {
+                  /* TODO: Replace the AutoCompleteSchool component below with
+                   * a similar implementation of an AutoCompleteCourse component
+                   */
+                }
+                <AutoCompleteSchool onSelectSchool={this.onSelectSchool} />
+              </div>) :
+              null}
+          {
+            // End of select school
+          }
+
+          {
+            // Select courses
+          }
+          {this.state.mode === SignUpModes.COURSES ?
+              (<div>
+                <h3 className={s.promptTitle}>
+                  Select your classes<br />at {this.state.school.name}
+                </h3>
+                <span>Search for your courses below.</span>
+                <RaisedButton
+                  className={s.editSchoolButton}
+                  label="Edit School"
+                  labelColor="#afafaf"
+                  onClick={this.goEditSchool}
+                />
+                <AutoCompleteSchool onSelectSchool={this.onSelectSchool} />
+              </div>) :
+              null}
+          {
+            // End of select courses
+          }
+
         </Dialog>
       </div>
     );
   }
 }
+
+export default withStyles(s)(SignUpModal);
