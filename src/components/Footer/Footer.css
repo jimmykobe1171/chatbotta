@@ -11,7 +11,10 @@
 
 .root {
   background: #333;
+  bottom: 0;
   color: #fff;
+  position: fixed;
+  width: 100%;
 }
 
 .container {
@@ -25,23 +28,7 @@
   color: rgba(255, 255, 255, 0.5);
 }
 
-.spacer {
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.text,
-.link {
+.text {
   padding: 2px 5px;
   font-size: 1em;
-}
-
-.link,
-.link:active,
-.link:visited {
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: none;
-}
-
-.link:hover {
-  color: rgba(255, 255, 255, 1);
 }

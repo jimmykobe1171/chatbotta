@@ -7,19 +7,12 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React from 'react';
-import Home from './Home';
-import Layout from '../../components/Layout';
+@import '../variables.css';
 
-export default {
+:root {
+  --brand-color: #fff;
+}
 
-  path: '/',
-
-  async action() {
-    return {
-      title: 'Chatbot TA',
-      component: <Layout><Home /></Layout>,
-    };
-  },
-
-};
+.root {
+  margin: -10px;
+}

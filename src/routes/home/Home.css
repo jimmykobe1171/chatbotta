@@ -10,51 +10,28 @@
 @import '../../components/variables.css';
 
 .root {
-  padding-left: 20px;
-  padding-right: 20px;
-  background-color: #F9F8F6;
+  background-color: #f9f8f6;
+  bottom: 0;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  z-index: -1;
 }
 
 .container {
-  margin: 0 auto;
-  padding: 0 0 40px;
+  margin: auto;
   max-width: var(--max-content-width);
   position: relative;
-  top: 20px;
-
+  top: 25%;
 }
 
-.passage{
+.passage {
   width: 460px;
   height: 260px;
   float: right;
 }
 
-/*
-.newsItem {
-  margin: 0 0 2rem;
+.robotImg {
+  height: 380px;
+  width: 350px;
 }
-
-.newsTitle {
-  font-size: 1.5rem;
-}*/
-
-/*.newsDesc {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-size: 1.125rem;
-  }
-
-  pre {
-    white-space: pre-wrap;
-    font-size: 0.875rem;
-  }
-
-  img {
-    max-width: 100%;
-  }
-}*/
