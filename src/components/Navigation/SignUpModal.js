@@ -13,7 +13,7 @@ import s from './SignUpModal.css';
 export default class SignUpModal extends React.Component {
   constructor(props) {
     super(props);
-    this.onUpdateInput = this.onUpdateInput.bind(this);
+    // this.onUpdateInput = this.onUpdateInput.bind(this);
     this.state = {
       open: false,
       student: true,
