@@ -37,10 +37,14 @@ h3.promptTitle {
 }
 
 .actionButton {
-  margin: 0 16px 16px 0;
+  margin: 0 10px 10px 0;
 }
 
 .leftButton {
   float: left;
-  margin: 0 0 16px 16px;
+  margin: 0 0 10px 10px;
+}
+
+.radioButton {
+  margin-bottom: 5px;
 }

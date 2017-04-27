@@ -3,13 +3,16 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
+import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
 import AutoCompleteSchool from './AutoCompleteSchool';
+import AutoCompleteCourse from './AutoCompleteCourse';
 import s from './SignUpModal.css';
 
 const SignUpModes = {
   SCHOOL: 1,
   COURSES: 2,
-  SUMMARY: 3,
+  ROLE: 3,
+  SUMMARY: 4,
 };
 
 class SignUpModal extends React.Component {
@@ -19,6 +22,8 @@ class SignUpModal extends React.Component {
       mode: SignUpModes.SCHOOL,
       open: false,
       school: null,
+      courses: null,
+      role: null,
     };
   }
 
@@ -29,11 +34,32 @@ class SignUpModal extends React.Component {
     });
   }
 
+  onSelectCourse = (courses) => {
+    this.setState({
+      mode: SignUpModes.COURSES,
+      courses,
+    });
+  }
+
+  onSelectRole = (role) => {
+    this.setState({
+      mode: SignUpModes.ROLE,
+      role,
+    });
+  }
+
+  onSummary = () => {
+    this.setState({
+      mode: SignUpModes.SUMMARY,
+    });
+  }
+
   goEditSchool = () => {
     this.setState({
       mode: SignUpModes.SCHOOL,
     });
   }
+
 
   handleOpen = () => {
     this.setState({ open: true });
@@ -50,11 +76,12 @@ class SignUpModal extends React.Component {
      *    avoid the linter's nested-ternary check;
      */
     const firstButtonLogic =
-        this.state.mode === SignUpModes.COURSES ?
+      this.state.mode === SignUpModes.COURSES ?
           (<RaisedButton
             className={s.leftButton}
             label="Add Course"
             labelColor="#afafaf"
+            onClick={this.onSelectCourse}
           />) : null;
 
     const actions = [
@@ -68,6 +95,15 @@ class SignUpModal extends React.Component {
         <RaisedButton
           className={s.actionButton}
           label="Join Courses"
+          onClick={this.onSelectRole}
+          primary
+        /> :
+          null,
+      this.state.mode === SignUpModes.ROLE ?
+        <RaisedButton
+          className={s.actionButton}
+          label="Join Courses"
+          onClick={this.onSummary}
           primary
         /> :
           null,
@@ -132,11 +168,54 @@ class SignUpModal extends React.Component {
                   labelColor="#afafaf"
                   onClick={this.goEditSchool}
                 />
-                <AutoCompleteSchool onSelectSchool={this.onSelectSchool} />
+                <AutoCompleteCourse onSelectCourse={this.onSelectCourse} />
               </div>) :
               null}
           {
             // End of select courses
+          }
+
+          {
+            // Select role  TODO: role status
+          }
+          {this.state.mode === SignUpModes.ROLE ?
+              (<div>
+                <p>{this.state.courses.name}</p>
+                <RaisedButton
+                  className={s.editSchoolButton}
+                  label="Edit School"
+                  labelColor="#afafaf"
+                  onClick={this.goEditSchool}
+                />
+                <span>Join as:</span>
+                <div>
+                  <RadioButtonGroup name="roleSelection">
+                    <RadioButton
+                      value="student"
+                      label="Student"
+                      className={s.radioButton}
+                    />
+                    <RadioButton
+                      value="ta"
+                      label="TA"
+                      className={s.radioButton}
+                    />
+                    <RadioButton
+                      value="professor"
+                      label="Professor"
+                      className={s.radioButton}
+                    />
+                  </RadioButtonGroup>
+                </div>
+              </div>) :
+              null}
+
+          {
+            // End of select role
+          }
+
+          {
+            // TODO: Show summary
           }
 
         </Dialog>
