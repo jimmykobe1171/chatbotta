@@ -4,6 +4,7 @@ import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
+import TextField from 'material-ui/TextField';
 import AutoCompleteSchool from './AutoCompleteSchool';
 import AutoCompleteCourse from './AutoCompleteCourse';
 import s from './SignUpModal.css';
@@ -24,6 +25,11 @@ class SignUpModal extends React.Component {
       school: null,
       courses: null,
       role: null,
+      data: [],
+      email: '',
+      errorInvalidCred: false,
+      formValid: false,
+      password: '',
     };
   }
 
@@ -41,10 +47,9 @@ class SignUpModal extends React.Component {
     });
   }
 
-  onSelectRole = (role) => {
+  onSelectRole = () => {
     this.setState({
       mode: SignUpModes.ROLE,
-      role,
     });
   }
 
@@ -54,12 +59,83 @@ class SignUpModal extends React.Component {
     });
   }
 
+  handleRoleSelection = (e) => {
+    this.setState({
+      role: e.target.value,
+    });
+  }
+
   goEditSchool = () => {
     this.setState({
       mode: SignUpModes.SCHOOL,
     });
   }
 
+  goEditCourses = () => {
+    this.setState({
+      mode: SignUpModes.COURSES,
+    });
+  }
+
+  validateEmail = (email) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  }
+
+  handleEmailChange = (e) => {
+    this.setState({
+      email: e.target.value,
+      formValid: e.target.value !== '' &&
+          this.validateEmail(e.target.value) &&
+          this.state.password !== '',
+    });
+    this.setState({ errorInvalidCred: false });
+  }
+
+  handlePasswordChange = (e) => {
+    this.setState({
+      password: e.target.value,
+      formValid: e.target.value !== '' &&
+          this.validateEmail(this.state.email) &&
+          this.state.email !== '',
+    });
+    this.setState({ errorInvalidCred: false });
+  }
+
+  handleSignUpSubmit = () => {
+    fetch('/api/login', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: this.state.email,
+        password: this.state.password,
+      }),
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
+      }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
+    })
+      .then((resp) => {
+        console.log('SignUpModal - handleSignUpSubmit -  SUCCESS', resp);
+        history.push({
+          pathname: '/dashboard',
+          state: {
+            courses: resp.courses,
+            username: resp.username,
+          },
+        });
+      })
+      .catch((e) => {
+        console.log('SignUpModal - handleSignUpSubmit - FAIL', e);
+        this.setState({ errorInvalidCred: true });
+      });
+  }
 
   handleOpen = () => {
     this.setState({ open: true });
@@ -104,6 +180,14 @@ class SignUpModal extends React.Component {
           className={s.actionButton}
           label="Join Courses"
           onClick={this.onSummary}
+          primary
+        /> :
+          null,
+      this.state.mode === SignUpModes.SUMMARY ?
+        <RaisedButton
+          className={s.actionButton}
+          label="submit"
+          onClick={this.handleClose}
           primary
         /> :
           null,
@@ -189,21 +273,24 @@ class SignUpModal extends React.Component {
                 />
                 <span>Join as:</span>
                 <div>
-                  <RadioButtonGroup name="roleSelection">
+                  <RadioButtonGroup name="selectRole">
                     <RadioButton
-                      value="student"
-                      label="Student"
+                      label="student"
+                      value={'student'}
                       className={s.radioButton}
+                      onChange={this.handleRoleSelection}
                     />
                     <RadioButton
-                      value="ta"
                       label="TA"
+                      value="TA"
                       className={s.radioButton}
+                      onChange={this.handleRoleSelection}
                     />
                     <RadioButton
+                      label="professor"
                       value="professor"
-                      label="Professor"
                       className={s.radioButton}
+                      onChange={this.handleRoleSelection}
                     />
                   </RadioButtonGroup>
                 </div>
@@ -215,9 +302,36 @@ class SignUpModal extends React.Component {
           }
 
           {
-            // TODO: Show summary
+            // Summary
           }
 
+          {this.state.mode === SignUpModes.SUMMARY ?
+            (<div>
+              <RaisedButton
+                className={s.editSchoolButton}
+                label="Edit Courses"
+                labelColor="#afafaf"
+                onClick={this.goEditCourse}
+              />
+              <p>{this.state.school.name}</p>
+              <p>{this.state.courses.name}</p>
+              <p>Join as [ ]{this.state.role}</p>
+              <p>Enter your school email and password to register</p>
+              <TextField
+                hintText="Email"
+                value={this.state.email}
+                onChange={this.handleEmailChange}
+                fullWidth
+              />
+              <TextField
+                hintText="Password"
+                type="password"
+                value={this.state.password}
+                onChange={this.handlePasswordChange}
+                fullWidth
+              />
+            </div>) : null
+          }
         </Dialog>
       </div>
     );
