@@ -121,7 +121,7 @@ class LogInModal extends React.Component {
               <span>Chatbot TA</span>
             </div>
             <div className={s.bannerSubtitle}>
-              <span>Sign in with the TREMENDOUS learning platform</span>
+              <span>Sign in with our TREMENDOUS learning platform</span>
             </div>
           </div>
           <TextField

@@ -2,19 +2,19 @@ import React, { PropTypes } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import MenuItem from 'material-ui/MenuItem';
 
-export default class AutoCompleteSchool extends React.Component {
+export default class AutoCompleteCourse extends React.Component {
   static propTypes = {
-    onSelectSchool: PropTypes.func.isRequired,
+    onSelectCourse: PropTypes.func.isRequired,
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      inputSchool: '',
-      schoolData: [],
+      inputCourse: '',
+      courseData: [],
       dataSource: [],
     };
-    fetch('/api/schools', {
+    fetch('/api/courses', {
       method: 'get',
       headers: {
         Accept: 'application/json',
@@ -31,30 +31,30 @@ export default class AutoCompleteSchool extends React.Component {
         })
         .then((resp) => {
           this.setState({
-            schoolData: resp,
+            courseData: resp,
           });
           this.setState({
-            dataSource: this.state.schoolData
-                .map(school => ({
-                  text: school.name,
+            dataSource: this.state.courseData
+                .map(course => ({
+                  text: course.name,
                   value: (
                     <MenuItem
-                      primaryText={school.name}
+                      primaryText={course.name}
                     />
                   ),
                 })),
           });
           console.log(
-              'AutoCompleteSchool - Get Schools -  SUCCESS',
+              'AutoCompleteCourse - Get Courses -  SUCCESS',
               this.state.dataSource);
         })
         .catch((e) => {
-          console.log('AutoCompleteSchool - Get Schools - FAIL', e);
+          console.log('AutoCompleteCourse - Get Courses - FAIL', e);
         });
   }
 
   onNewRequest = (chosenRequest, index) => {
-    this.props.onSelectSchool(this.state.schoolData[index]);
+    this.props.onSelectCourse(this.state.courseData[index]);
   }
 
   render() {
@@ -62,7 +62,7 @@ export default class AutoCompleteSchool extends React.Component {
       <div>
         <AutoComplete
           filter={AutoComplete.fuzzyFilter}
-          hintText="e.g. My University"
+          hintText="e.g. My Course"
           dataSource={this.state.dataSource}
           fullWidth
           maxSearchResults={5}
