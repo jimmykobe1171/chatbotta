@@ -152,13 +152,7 @@ class SignUpModal extends React.Component {
     })
       .then((resp) => {
         console.log('SignUpModal - signUp - SUCCESS', resp);
-        history.push({
-          pathname: '/dashboard',
-          state: {
-            courses: this.selectedCourses(),
-            username: this.state.email,
-          },
-        });
+        history.push('/dashboard');
       })
       .catch((e) => {
         console.log('SignUpModal - signUp - FAIL', e);
