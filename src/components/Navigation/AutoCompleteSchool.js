@@ -36,13 +36,12 @@ export default class AutoCompleteSchool extends React.Component {
           this.setState({
             dataSource: this.state.schoolData
                 .map(school => ({
-                  id: school.id,
                   text: school.name,
                   value: (
                     <MenuItem
                       primaryText={school.name}
                     />
-                    ),
+                  ),
                 })),
           });
           console.log(

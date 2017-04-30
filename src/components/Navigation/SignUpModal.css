@@ -22,7 +22,7 @@
 }
 
 .bannerSubtitle {
-  color: rgba(0, 0, 0, 0.5);
+  color: #f5f5f5;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
@@ -31,9 +31,8 @@ h3.promptTitle {
 }
 
 .editSchoolButton {
-  position: fixed;
-  right: 24px;
-  top: 100px;
+  float: right;
+  margin-top: -8px;
 }
 
 .actionButton {
@@ -43,4 +42,42 @@ h3.promptTitle {
 .leftButton {
   float: left;
   margin: 0 0 16px 16px;
+}
+
+.courseList {
+  max-height: 400px;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+.courseSummary {
+  float: left;
+  max-height: 400px;
+  overflow-y: scroll;
+  width: 54%;
+}
+
+.courseSummaryCard {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  margin: 5px;
+  padding: 10px;
+}
+
+.courseSummaryTitle {
+  font-size: 18px;
+  font-weight: bolder;
+}
+
+.profile {
+  float: right;
+  width: 43%;
+}
+
+span.error {
+  color: #e55a5d;
+}
+
+.joinTypeImage {
+  height: 24px;
+  margin-right: 5px;
 }
