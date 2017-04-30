@@ -1,11 +1,11 @@
-// import chai from 'chai';
+import chai from 'chai';
 import request from 'supertest';
 import models from '../../src/data/models';
 import app from '../../src/app';
 import { loadFixtures } from '../../src/data/utils';
 
 
-// const assert = chai.assert;
+const assert = chai.assert;
 
 /*
  * post a message
@@ -80,10 +80,30 @@ describe('GET /api/messages/', () => {
       } else {
         // get a messages
         agent
-        .get('/api/messages/?courseId=1')
+        .post('/api/messages/')
+        .send({ courseId: 1, content: 'Hello!' })
         .expect('Content-Type', /json/)
-        .expect(200, done);
-
+        .end((err, res) => {
+          if (err || !res.ok) {
+            done(err);
+          } else {
+            // get messages after one sec
+            setTimeout(() => {
+              console.log('Wait a sec.');
+              agent
+                .get('/api/messages/?courseId=1')
+                .expect('Content-Type', /json/)
+                .expect((res) => {
+                  // console.log(res.body);
+                  // console.log(res.body.length);
+                  assert(res.body.length === 2);
+                  assert(res.body[0].studentId === 1);
+                  assert(res.body[1].senderType === 'chatbot');
+                })
+                .expect(200, done);
+            }, 1500);
+          }
+        });
       }
     });
   });
