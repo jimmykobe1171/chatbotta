@@ -44,7 +44,7 @@ class DashboardHeader extends React.Component {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
-      credentials: 'include',
+      credentials: 'same-origin',
     }).then((resp) => {
       if (resp.status >= 200 && resp.status < 300) {
         return resp.json();

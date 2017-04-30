@@ -65,6 +65,7 @@ class LogInModal extends React.Component {
         email: this.state.email,
         password: this.state.password,
       }),
+      credentials: 'same-origin',
     }).then((resp) => {
       if (resp.status >= 200 && resp.status < 300) {
         return resp.json();
