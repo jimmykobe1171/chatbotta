@@ -1,7 +1,7 @@
 import express from 'express';
 import { Message } from '../data/models';
 import { isAuthenticated } from '../core/middleware';
-import { MESSAGE_TYPES } from '../data/models/constants';
+import { MESSAGE_TYPES, MESSAGE_SENDER_TYPES } from '../data/models/constants';
 import apiaiApp from '../core/apiai';
 
 // const express = require('express');
@@ -25,12 +25,25 @@ const router = express.Router();
 //   return data
 // }
 
-function getApiaiResponseSuccess(response) {
-
+function getApiaiResponseSuccess(question, response) {
+    const responseMsg = response.result.fulfillment.speech;
+    Message.create({
+      studentId: question.studentId,
+      courseId: question.courseId,
+      content: responseMsg,
+      type: MESSAGE_TYPES.ANSWER,
+      questionId: question.id,
+      senderType: MESSAGE_SENDER_TYPES.CHATBOT,
+    }).then((message) => {
+      // do nothing
+      console.log('create chatbot answer success');
+    }).catch((err) => {
+      console.log(err);
+    });
 }
 
 function getApiaiResponseFail(error) {
-
+    // do nothing
 }
 
 
@@ -67,14 +80,13 @@ router.post('/Messages/', isAuthenticated, (req, res) => {
   const content = req.body.content;
   if (courseId && studentId && content) {
     Message.create({
-      studentId,
-      courseId,
-      content,
+      studentId: studentId,
+      courseId: courseId,
+      content: content,
       type: MESSAGE_TYPES.QUESTION,
     }).then((message) => {
       // connect with api.ai
-      
-      apiaiApp.getResponse(content, getApiaiResponseSuccess, getApiaiResponseFail);
+      apiaiApp.getResponse(content, getApiaiResponseSuccess.bind(null, message), getApiaiResponseFail);
       res.json({});
     }).catch((err) => {
       console.log(err);
