@@ -132,6 +132,7 @@ class SignUpModal extends React.Component {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
+      credentials: 'same-origin',
       body: JSON.stringify({
         email: this.state.email,
         password: this.state.password,
