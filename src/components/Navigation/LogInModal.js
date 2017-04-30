@@ -74,7 +74,7 @@ class LogInModal extends React.Component {
       throw error;
     })
       .then((resp) => {
-        console.log('LogInModal - handleLoginSubmit -  SUCCESS', resp);
+        console.log('LogInModal - handleLoginSubmit - SUCCESS', resp);
         history.push({
           pathname: '/dashboard',
           state: {
