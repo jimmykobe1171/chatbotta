@@ -132,6 +132,7 @@ class SignUpModal extends React.Component {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
+      credentials: 'same-origin',
       body: JSON.stringify({
         email: this.state.email,
         password: this.state.password,
@@ -320,7 +321,7 @@ class SignUpModal extends React.Component {
           {this.state.mode === SignUpModes.SCHOOL ?
               (<div>
                 <h3 className={s.promptTitle}>Select your school</h3>
-                <span>Search for your courses below.</span>
+                <span>Search for your school below.</span>
                 {
                     /* TODO: Replace the AutoCompleteSchool component below with
                      * a similar implementation of an AutoCompleteCourse component

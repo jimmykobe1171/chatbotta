@@ -1,0 +1,41 @@
+.dialogView {
+  height: 380px;
+  overflow-y: scroll;
+  padding: 5px;
+}
+
+.botMessage {
+  padding: 5px;
+  text-align: left;
+}
+
+.userMessage {
+  padding: 5px;
+  text-align: right;
+}
+
+.messageBubble {
+  border-radius: 16px;
+  padding: 5px 10px;
+}
+
+.botMessage .messageBubble {
+  background-color: #c1c1c1;
+}
+
+.userMessage .messageBubble {
+  background-color: #a8cee2;
+  color: white;
+}
+
+.textField {
+  height: 100px;
+  overflow-y: hidden;
+  padding-left: 20px;
+  text-align: left;
+}
+
+.sendButton {
+  float: right;
+  margin: 20px;
+}
