@@ -3,6 +3,9 @@ import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MenuItem from 'material-ui/MenuItem';
+import IconMenu from 'material-ui/IconMenu';
+import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './DashboardHeader.css';
@@ -24,12 +27,43 @@ class DashboardHeader extends React.Component {
 
   constructor(props, context) {
     super(props, context);
-    this.state = { open: false };
+    this.state = {
+      open: false,
+    };
   }
 
   handleToggle = () => {
     this.setState({ open: !this.state.open });
   }
+
+
+  handleLogout = () => {
+    fetch('/api/logout', {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
+      }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
+    }).then((resp) => {
+      console.log('DashboardHeader - handleLogoutSubmit - SUCCESS', resp);
+      history.push({
+        pathname: '/',
+      });
+    })
+      .catch((e) => {
+        console.log('DashboardHeader - handleLogoutSubmit - FAIL', e);
+        this.setState({ errorInvalidCred: true });
+      });
+  }
+
 
   render() {
     return (
@@ -37,8 +71,9 @@ class DashboardHeader extends React.Component {
         <div className={s.root}>
           <AppBar
             isInitiallyOpen={false}
-            title={this.props.username}
+            title={this.state.course}
             onLeftIconButtonTouchTap={this.handleToggle}
+            iconElementRight={<FlatButton label="logout" onClick={this.handleLogout} />}
           />
           <Drawer
             docked={false}
