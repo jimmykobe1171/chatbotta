@@ -10,7 +10,7 @@
 import React, { } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Home.css';
-import robotImg from './robots-start.png';
+import robotImg from '../../images/robots-start.png';
 
 class Home extends React.Component {
   render() {

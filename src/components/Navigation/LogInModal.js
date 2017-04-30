@@ -74,7 +74,7 @@ class LogInModal extends React.Component {
       throw error;
     })
       .then((resp) => {
-        console.log('LogInModal - handleLoginSubmit -  SUCCESS', resp);
+        console.log('LogInModal - handleLoginSubmit - SUCCESS', resp);
         history.push({
           pathname: '/dashboard',
           state: {
@@ -121,7 +121,7 @@ class LogInModal extends React.Component {
               <span>Chatbot TA</span>
             </div>
             <div className={s.bannerSubtitle}>
-              <span>Sign in with the TREMENDOUS learning platform</span>
+              <span>Sign in with our TREMENDOUS learning platform</span>
             </div>
           </div>
           <TextField
