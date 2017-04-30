@@ -1,7 +1,7 @@
 import apiai from 'apiai';
 
 
-const TOKEN = 'a0db4e6121b44d6f8bba13c4fcb73c26';
+const TOKEN = '4c25b58a44844b33bf865efc4d1e2853';
 const app = apiai(TOKEN);
 
 

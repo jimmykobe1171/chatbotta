@@ -47,6 +47,17 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      botMessageIds: [],
+      courses: [],
+      dialog: [],
+      inputValid: false,
+      message: '',
+      username: '',
+      userId: null,
+    };
+
+    // Get current user
     fetch('/api/current-user', {
       method: 'get',
       headers: {
@@ -65,85 +76,104 @@ class Dashboard extends React.Component {
       .then((resp) => {
         console.log('Dashboard - currentUser - SUCCESS', resp);
         this.setState({
-          username: history.location.state.username,
-          courses: history.location.state.courses,
+          userId: resp.userId,
+          username: resp.username,
+          courses: resp.courses,
         });
       })
       .catch((e) => {
         console.log('Dashboard - currentUser - FAIL', e);
         history.push('/');
       });
+  }
 
-    this.state = {
-      dialog: [
-        {
-          sender: 'user',
-          content: 'What is the deadline for the next homework?',
-        },
-        {
-          sender: 'bot',
-          content: "It's May 11, next Monday.",
-        },
-        {
-          sender: 'user',
-          content: 'When and where is the final?',
-        },
-        {
-          sender: 'bot',
-          content: 'The final is on May 8 at Mudd.',
-        },
-        {
-          sender: 'user',
-          content: 'What is the deadline for the next homework?',
-        },
-        {
-          sender: 'bot',
-          content: "It's May 11, next Monday.",
-        },
-        {
-          sender: 'user',
-          content: 'When and where is the final?',
-        },
-        {
-          sender: 'bot',
-          content: 'The final is on May 8 at Mudd.',
-        },
-        {
-          sender: 'user',
-          content: 'What is the deadline for the next homework?',
-        },
-        {
-          sender: 'bot',
-          content: "It's May 11, next Monday.",
-        },
-        {
-          sender: 'user',
-          content: 'When and where is the final?',
-        },
-        {
-          sender: 'bot',
-          content: 'The final is on May 8 at Mudd.',
-        },
-        {
-          sender: 'user',
-          content: 'What is the deadline for the next homework?',
-        },
-        {
-          sender: 'bot',
-          content: "It's May 11, next Monday.",
-        },
-        {
-          sender: 'user',
-          content: 'When and where is the final?',
-        },
-        {
-          sender: 'bot',
-          content: 'The final is on May 8 at Mudd.',
-        },
-      ],
-      username: '',
-      courses: [],
-    };
+  componentDidMount() {
+    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+  }
+
+  async getChatbotMessage() {
+    fetch(`/api/messages?userId=${this.state.userId}&courseId=1`, {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
+      }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
+    }).then((resp) => {
+      console.log('Dashboard - getChatbotMessage - SUCCESS', resp);
+      resp.forEach((message) => {
+        if (message.senderType === 'chatbot' &&
+            this.state.botMessageIds.indexOf(message.id) === -1) {
+          const dialog = this.state.dialog.slice();
+          dialog.push(
+            {
+              sender: 'bot',
+              content: message.content,
+            },
+          );
+          const botMessageIds = this.state.botMessageIds.slice();
+          botMessageIds.push(message.id);
+          this.setState({
+            botMessageIds,
+            dialog,
+          });
+        }
+      });
+    }).catch((e) => {
+      console.log('Dashboard - getChatbotMessage - FAIL', e);
+    });
+  }
+
+  // TODO: Change the course ID to the correct one
+  sendMessage = () => {
+    const dialog = this.state.dialog.slice();
+    dialog.push(
+      {
+        sender: 'user',
+        content: this.state.message,
+      },
+    );
+    this.setState({
+      dialog,
+    });
+
+    fetch('/api/messages/', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        courseId: 1,
+        content: this.state.message,
+      }),
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
+      }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
+    }).then((resp) => {
+      console.log('Dashboard - sendMessage - SUCCESS', resp);
+    })
+    .catch((e) => {
+      console.log('Dashboard - sendMessage - FAIL', e);
+    });
+  }
+
+  handleMessageChange = (e) => {
+    this.setState({
+      message: e.target.value,
+    });
   }
 
   render() {
@@ -176,13 +206,17 @@ class Dashboard extends React.Component {
                   <TextField
                     hintText="Your Message"
                     multiLine
+                    onChange={this.handleMessageChange}
                     rows={5}
                     style={textFieldStyle}
+                    value={this.state.message}
                   />
                   <RaisedButton
                     className={s.sendButton}
+                    disabled={this.state.message === ''}
                     label="Send"
                     labelColor="#afafaf"
+                    onClick={this.sendMessage}
                     primary
                   />
                 </div>
