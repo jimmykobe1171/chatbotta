@@ -15,6 +15,7 @@ import schoolView from './views/schoolView';
 import courseView from './views/courseView';
 import lectureView from './views/lectureView';
 import lectureMaterialView from './views/lectureMaterialView';
+import MessageView from './views/MessageView';
 
 
 const app = express();
@@ -45,6 +46,7 @@ app.use('/api', schoolView);
 app.use('/api', courseView);
 app.use('/api', lectureView);
 app.use('/api', lectureMaterialView);
+app.use('/api', MessageView);
 
 //
 // Error handling

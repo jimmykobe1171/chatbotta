@@ -14,13 +14,16 @@ import School from './School';
 import Course from './Course';
 import Lecture from './Lecture';
 import LectureMaterial from './LectureMaterial';
+import Message from './Message';
+import { USER_TYPES } from './constants';
+
 
 // define relationships
 School.hasMany(User);
 
 const UserCourse = sequelize.define('UserCourse', {
   joinType: {
-    type: DataType.ENUM('student', 'ta', 'professor'),
+    type: DataType.ENUM(USER_TYPES.STUDENT, USER_TYPES.TA, USER_TYPES.PROFESSOR),
     allowNull: false,
   },
 });
@@ -37,24 +40,10 @@ Course.hasMany(Lecture);
 
 School.hasMany(Course);
 
-// User.hasMany(UserLogin, {
-//   foreignKey: 'userId',
-//   as: 'logins',
-//   onUpdate: 'cascade',
-//   onDelete: 'cascade',
-// });
-
-
-// User.hasOne(UserProfile, {
-//   foreignKey: 'userId',
-//   as: 'profile',
-//   onUpdate: 'cascade',
-//   onDelete: 'cascade',
-// });
 
 function sync(...args) {
   return sequelize.sync(...args);
 }
 
 export default { sync };
-export { User, School, Course, Lecture, LectureMaterial, UserCourse };
+export { User, School, Course, Lecture, LectureMaterial, UserCourse, Message };
