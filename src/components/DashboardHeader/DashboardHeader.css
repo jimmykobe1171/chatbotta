@@ -17,15 +17,15 @@
   margin: -10px;
 }
 
-.header{
-	display: flex;
+.header {
+  display: flex;
 }
 
 .user {
   z-index: 1101;
   display: inline;
   top: 20px;
-  left: 1100px;
+  left: 1020px;
   position: absolute;
   color: #fff;
 }
