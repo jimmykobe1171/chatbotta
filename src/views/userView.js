@@ -77,42 +77,42 @@ router.post('/register/', (req, res) => {
     const dic = {};
     User.create({
       username: email,
-      email,
-      password,
+      email: email,
+      password: password,
     })
-            .then((user) => {
-              dic.user = user;
-              return School.findById(schoolId);
-            })
-            .then((school) => {
-                // set school to user
-              const user = dic.user;
-              return school.addUser(user);
-            })
-            .then(() => {
-                // set courses to user
-              const user = dic.user;
-              const allPromises = [];
-              for (let i = 0; i < courses.length; i++) {
-                allPromises.push(user.addCourse(courseIds[i], joinTypes[i]));
-              }
-              return Promise.all(allPromises);
-            })
-            .then(() => {
-              const user = dic.user;
-                // login new registered user
-              req.logIn(user, (err) => {
-                if (err) {
-                  res.status(400).json({ error: 'login user failed' });
-                } else {
-                  res.json({ userId: user.id });
-                }
-              });
-            })
-            .catch((err) => {
-                // console.log(err.message);
-              res.status(400).json({ error: err.errors[0].message });
-            });
+    .then((user) => {
+      dic.user = user;
+      return School.findById(schoolId);
+    })
+    .then((school) => {
+        // set school to user
+      const user = dic.user;
+      return school.addUser(user);
+    })
+    .then(() => {
+        // set courses to user
+      const user = dic.user;
+      const allPromises = [];
+      for (let i = 0; i < courses.length; i++) {
+        allPromises.push(user.addCourse(courseIds[i], joinTypes[i]));
+      }
+      return Promise.all(allPromises);
+    })
+    .then(() => {
+      const user = dic.user;
+        // login new registered user
+      req.logIn(user, (err) => {
+        if (err) {
+          res.status(400).json({ error: 'login user failed' });
+        } else {
+          res.json({ userId: user.id });
+        }
+      });
+    })
+    .catch((err) => {
+        // console.log(err.message);
+      res.status(400).json({ error: err.errors[0].message });
+    });
   } else {
     res.status(400).json({ error: 'invalid data' });
   }
@@ -145,6 +145,21 @@ router.post('/login/',
 router.get('/logout/', isAuthenticated, (req, res) => {
   req.logout();
   res.json({});
+});
+
+/*
+ * get current user
+ */
+router.get('/current-user/', isAuthenticated, (req, res) => {
+    const user = req.user;
+    getUserLoginData(user)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ error: 'get user data failed' });
+    });
 });
 
 
