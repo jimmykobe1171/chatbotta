@@ -76,12 +76,15 @@ class DashboardHeader extends React.Component {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className={s.root}>
-          <AppBar
-            isInitiallyOpen={false}
-            title={this.props.courses[this.state.courseIndex].name}
-            onLeftIconButtonTouchTap={this.handleToggle}
-            iconElementRight={<FlatButton label="logout" onClick={this.handleLogout} />}
-          />
+          <div className={s.header}>
+            <div className={s.user}>{this.props.username}</div>
+            <AppBar
+              isInitiallyOpen={false}
+              title={this.props.courses[this.state.courseIndex].name}
+              onLeftIconButtonTouchTap={this.handleToggle}
+              iconElementRight={<FlatButton label="logout" onClick={this.handleLogout} />}
+            />
+          </div>
           <Drawer
             docked={false}
             open={this.state.open}
