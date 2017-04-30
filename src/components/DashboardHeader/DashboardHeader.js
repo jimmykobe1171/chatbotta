@@ -9,6 +9,7 @@ import FlatButton from 'material-ui/FlatButton';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './DashboardHeader.css';
+import history from '../../core/history';
 
 const muiTheme = getMuiTheme({
   palette: {
@@ -54,9 +55,9 @@ class DashboardHeader extends React.Component {
       throw error;
     }).then((resp) => {
       console.log('DashboardHeader - handleLogoutSubmit - SUCCESS', resp);
-      history.push({
-        pathname: '/',
-      });
+      history.push(
+        '/',
+      );
     })
       .catch((e) => {
         console.log('DashboardHeader - handleLogoutSubmit - FAIL', e);
