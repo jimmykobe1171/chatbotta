@@ -50,7 +50,7 @@ function getApiaiResponseFail(error) {
 /*
  * get all messages related to specific user and course
  */
-router.get('/Messages/', isAuthenticated, (req, res) => {
+router.get('/messages/', isAuthenticated, (req, res) => {
   const studentId = req.query.userId || req.user.id;
   const courseId = req.query.courseId;
   if (courseId && studentId) {
@@ -74,7 +74,7 @@ router.get('/Messages/', isAuthenticated, (req, res) => {
 /*
  * post messages related to specific user and course
  */
-router.post('/Messages/', isAuthenticated, (req, res) => {
+router.post('/messages/', isAuthenticated, (req, res) => {
   const studentId = req.user.id;
   const courseId = req.body.courseId;
   const content = req.body.content;
