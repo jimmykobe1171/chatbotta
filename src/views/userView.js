@@ -147,5 +147,20 @@ router.get('/logout/', isAuthenticated, (req, res) => {
   res.json({});
 });
 
+/*
+ * get current user
+ */
+router.get('/current-user/', isAuthenticated, (req, res) => {
+    const user = req.user;
+    getUserLoginData(user)
+    .then((data) => {
+      res.json(data);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).json({ error: 'get user data failed' });
+    });
+});
+
 
 export default router;

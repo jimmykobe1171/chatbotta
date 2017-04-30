@@ -2,7 +2,7 @@ import express from 'express';
 import { Message } from '../data/models';
 import { isAuthenticated } from '../core/middleware';
 import { MESSAGE_TYPES } from '../data/models/constants';
-
+import apiaiApp from '../core/apiai';
 
 // const express = require('express');
 const router = express.Router();
@@ -24,6 +24,15 @@ const router = express.Router();
 //   }
 //   return data
 // }
+
+function getApiaiResponseSuccess(response) {
+
+}
+
+function getApiaiResponseFail(error) {
+
+}
+
 
 /*
  * get all messages related to specific user and course
@@ -63,9 +72,13 @@ router.post('/Messages/', isAuthenticated, (req, res) => {
       content,
       type: MESSAGE_TYPES.QUESTION,
     }).then((message) => {
+      // connect with api.ai
+      
+      apiaiApp.getResponse(content, getApiaiResponseSuccess, getApiaiResponseFail);
       res.json({});
     }).catch((err) => {
-      res.status(400).json({ error: err.errors[0].message });
+      console.log(err);
+      res.status(400).json({ error: 'send message failed' });
     });
   } else {
     res.status(400).json({ error: 'should provide course id and student id and content' });
