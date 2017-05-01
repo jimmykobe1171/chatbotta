@@ -16,6 +16,7 @@ import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import DashboardHeader from '../../components/DashboardHeader';
+import AnswerModal from './AnswerModal';
 import fetch from '../../core/fetch';
 import history from '../../core/history';
 import s from './Dashboard.css';
@@ -78,6 +79,8 @@ class Dashboard extends React.Component {
       ],
       username: '',
       userId: null,
+      showAnswer: false,
+      taAnswer: '',
     };
 
     // Get current user
@@ -111,7 +114,8 @@ class Dashboard extends React.Component {
   }
 
   componentDidMount() {
-    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+    /* this.timer = setInterval(() => this.getChatbotMessage(), 1000); */
+    this.getChatbotMessage();
   }
 
   onSelectCourse = (index) => {
@@ -212,6 +216,18 @@ class Dashboard extends React.Component {
     }
   }
 
+  handleDropDown = () => {
+    this.setState({
+      showAnswer: true,
+    });
+  }
+
+  handleTaAnswerChange = (e) => {
+    this.setState({
+      taAnswer: e.target.value.replace(/\n$/, ''),
+    });
+  }
+
   render() {
     const dialogMessages = this.state.dialog.map((message) => {
       const classNames = {
@@ -227,11 +243,13 @@ class Dashboard extends React.Component {
     });
 
     const questions = this.state.questions.map((question, idx) => (
-      <div className={idx % 2 === 0 ? s.evenRow : s.oddRow}>
-        <span className={s.questionColumn}>{question.content}</span>
-        <span className={s.studentNameColumn}>{question.studentName}</span>
-        <span className={s.dateColumn}>{(new Date(question.updatedAt)).toLocaleDateString()}</span>
-      </div>));
+      <AnswerModal
+        className={idx % 2 === 0 ? s.evenRow : s.oddRow}
+        questionContent={question.content}
+        studentName={question.studentName}
+        updatedAt={question.updatedAt}
+      />
+    ));
 
     return (this.state.username ?
         (<div>
