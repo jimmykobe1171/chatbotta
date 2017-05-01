@@ -130,6 +130,7 @@ class Dashboard extends React.Component {
     }).catch((e) => {
       console.log('Dashboard - getChatbotMessage - FAIL', e);
     });
+    this.scrollToBottom();
   }
 
   // TODO: Change the course ID to the correct one
@@ -185,6 +186,11 @@ class Dashboard extends React.Component {
     }
   }
 
+  scrollToBottom = () => {
+    const scrollItem = this.messageList;
+    scrollItem.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }
+
   render() {
     const dialogMessages = this.state.dialog.map((message) => {
       const classNames = {
@@ -193,7 +199,12 @@ class Dashboard extends React.Component {
       };
 
       return (<div className={classNames[message.sender]} >
-        <span className={s.messageBubble}>
+        <span
+          className={s.messageBubble}
+          ref={(div) => {
+            this.messageList = div;
+          }}
+        >
           {message.content}
         </span>
       </div>);
