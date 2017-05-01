@@ -54,6 +54,14 @@ class LogInModal extends React.Component {
     this.setState({ errorInvalidCred: false });
   }
 
+  handleEnterKeyAtEmailField = (e) => {
+    if (e.key === 'Enter') {
+      if (this.state.formValid) {
+        this.handleLoginSubmit();
+      }
+    }
+  }
+
   handleLoginSubmit = () => {
     fetch('/api/login', {
       method: 'post',
@@ -130,6 +138,7 @@ class LogInModal extends React.Component {
             type="password"
             value={this.state.password}
             onChange={this.handlePasswordChange}
+            onKeyDown={this.handleEnterKeyAtEmailField}
             fullWidth
           />
           {this.state.errorInvalidCred ?

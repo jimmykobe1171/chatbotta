@@ -7,7 +7,7 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-@import '../variables.css';
+@import '../../components/variables.css';
 
 :root {
   --brand-color: #fff;
@@ -15,4 +15,18 @@
 
 .root {
   margin: -10px;
+}
+
+.header {
+  display: flex;
+}
+
+.user {
+  color: white;
+  display: inline;
+  font-family: sans-serif;
+  position: absolute;
+  right: 105px;
+  top: 21px;
+  z-index: 1101;
 }
