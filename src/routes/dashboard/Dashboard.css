@@ -5,11 +5,13 @@
 }
 
 .botMessage {
+  margin: 5px 0;
   padding: 5px;
   text-align: left;
 }
 
 .userMessage {
+  margin: 5px 0;
   padding: 5px;
   text-align: right;
 }
