@@ -2,11 +2,9 @@ import React, { PropTypes } from 'react';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
-import IconMenu from 'material-ui/IconMenu';
-import IconButton from 'material-ui/IconButton';
 import FlatButton from 'material-ui/FlatButton';
-import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './DashboardHeader.css';
@@ -24,6 +22,7 @@ const muiTheme = getMuiTheme({
 class DashboardHeader extends React.Component {
   static propTypes = {
     courses: PropTypes.shape.isRequired,
+    onSelectCourse: PropTypes.func.isRequired,
     username: PropTypes.string.isRequired,
   }
 
@@ -32,6 +31,7 @@ class DashboardHeader extends React.Component {
     this.state = {
       open: false,
       courseIndex: 0,
+      drawerIsOpen: false,
     };
   }
 
@@ -40,8 +40,11 @@ class DashboardHeader extends React.Component {
   }
 
   handleCourseSelection = (e, menuItem, index) => {
-    /* this.setState({ courseIndex: index }); */
-    console.log('select course: ', index);
+    this.setState({
+      courseIndex: index,
+      open: false,
+    });
+    this.props.onSelectCourse(index);
   }
 
   handleLogout = () => {
@@ -61,9 +64,7 @@ class DashboardHeader extends React.Component {
       throw error;
     }).then((resp) => {
       console.log('DashboardHeader - handleLogoutSubmit - SUCCESS', resp);
-      history.push(
-        '/',
-      );
+      history.push('/');
     })
       .catch((e) => {
         console.log('DashboardHeader - handleLogoutSubmit - FAIL', e);
@@ -77,12 +78,16 @@ class DashboardHeader extends React.Component {
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className={s.root}>
           <div className={s.header}>
-            <div className={s.user}>{this.props.username}</div>
+            <span className={s.user}>{this.props.username}</span>
             <AppBar
               isInitiallyOpen={false}
               title={this.props.courses[this.state.courseIndex].name}
               onLeftIconButtonTouchTap={this.handleToggle}
-              iconElementRight={<FlatButton label="logout" onClick={this.handleLogout} />}
+              iconElementRight={
+                <FlatButton
+                  label="logout"
+                  onClick={this.handleLogout}
+                />}
             />
           </div>
           <Drawer
@@ -90,11 +95,14 @@ class DashboardHeader extends React.Component {
             open={this.state.open}
             onRequestChange={open => this.setState({ open })}
           >
-            {this.props.courses.map(course => (
-              <MenuItem
-                primaryText={course.name}
-                onClick={() => console.log('touch1')}
-              />))}
+            <Menu
+              onItemTouchTap={this.handleCourseSelection}
+            >
+              {this.props.courses.map(course => (
+                <MenuItem
+                  primaryText={course.name}
+                />))}
+            </Menu>
           </Drawer>
         </div>
       </MuiThemeProvider>
