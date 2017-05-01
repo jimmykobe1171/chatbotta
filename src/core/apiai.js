@@ -11,7 +11,7 @@ function getResponse(msg, successHandler, errorHandler) {
     };
     const request = app.textRequest(msg, options);
     request.on('response', function(response) {
-        console.log(response);
+        // console.log(response);
         successHandler(response);
     });
     request.on('error', function(error) {
