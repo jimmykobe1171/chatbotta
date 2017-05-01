@@ -83,8 +83,13 @@ function loadFixtures() {
     const jimmy = users[0];
     const allPromises = [];
     for (let i = 0; i < 2; i++) {
-        let joinType = i==0? 'student': 'ta';
+        let joinType = i<3? 'student': 'ta';
         allPromises.push(jimmy.addCourse(courses[i].id, {joinType: joinType}));
+    }
+    const ethan = users[1];
+    for (let i = 0; i < 2; i++) {
+        let joinType = i<3? 'ta': 'student';
+        allPromises.push(ethan.addCourse(courses[i].id, {joinType: joinType}));
     }
     return Promise.all(allPromises);
   })
