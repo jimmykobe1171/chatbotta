@@ -151,6 +151,7 @@ class Dashboard extends React.Component {
             botMessageIds,
             dialog,
           });
+          this.dialogView.scrollTop = this.dialogView.scrollHeight;
         }
       });
     }).catch((e) => {
@@ -169,6 +170,7 @@ class Dashboard extends React.Component {
     );
     this.setState({
       dialog,
+      message: '',
     });
 
     fetch('/api/messages/', {
@@ -191,6 +193,7 @@ class Dashboard extends React.Component {
       throw error;
     }).then((resp) => {
       console.log('Dashboard - sendMessage - SUCCESS', resp);
+      this.dialogView.scrollTop = this.dialogView.scrollHeight;
     })
     .catch((e) => {
       console.log('Dashboard - sendMessage - FAIL', e);
@@ -199,8 +202,14 @@ class Dashboard extends React.Component {
 
   handleMessageChange = (e) => {
     this.setState({
-      message: e.target.value,
+      message: e.target.value.replace(/\n$/, ''),
     });
+  }
+
+  handleEnterKey = (e) => {
+    if (e.key === 'Enter' && this.state.message !== '') {
+      this.sendMessage();
+    }
   }
 
   render() {
@@ -221,7 +230,7 @@ class Dashboard extends React.Component {
       <div className={idx % 2 === 0 ? s.evenRow : s.oddRow}>
         <span className={s.questionColumn}>{question.content}</span>
         <span className={s.studentNameColumn}>{question.studentName}</span>
-        <span className={s.dateColumn}>{(new Date(question.date)).toString()}</span>
+        <span className={s.dateColumn}>{(new Date(question.updatedAt)).toLocaleDateString()}</span>
       </div>));
 
     return (this.state.username ?
@@ -235,7 +244,10 @@ class Dashboard extends React.Component {
             <Paper style={largePaperStyle} zDepth={4}>
               {this.state.courses[this.state.courseIndex].joinType === 'student' ?
                 (<Paper style={smallPaperStyle} zDepth={2}>
-                  <div className={s.dialogView}>
+                  <div
+                    className={s.dialogView}
+                    ref={(ref) => { this.dialogView = ref; }}
+                  >
                     {dialogMessages}
                   </div>
                   <div className={s.textField}>
@@ -243,6 +255,7 @@ class Dashboard extends React.Component {
                       hintText="Your Message"
                       multiLine
                       onChange={this.handleMessageChange}
+                      onKeyDown={this.handleEnterKey}
                       rows={5}
                       style={textFieldStyle}
                       value={this.state.message}

@@ -26,12 +26,11 @@ class DashboardHeader extends React.Component {
     username: PropTypes.string.isRequired,
   }
 
-  constructor(props, context) {
-    super(props, context);
+  constructor(props) {
+    super(props);
     this.state = {
       open: false,
       courseIndex: 0,
-      drawerIsOpen: false,
     };
   }
 
@@ -74,13 +73,16 @@ class DashboardHeader extends React.Component {
 
 
   render() {
+    const courseItems = this.props.courses.map(course => (<MenuItem
+      primaryText={course.name}
+    />));
+
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div className={s.root}>
           <div className={s.header}>
             <span className={s.user}>{this.props.username}</span>
             <AppBar
-              isInitiallyOpen={false}
               title={this.props.courses[this.state.courseIndex].name}
               onLeftIconButtonTouchTap={this.handleToggle}
               iconElementRight={
@@ -98,10 +100,7 @@ class DashboardHeader extends React.Component {
             <Menu
               onItemTouchTap={this.handleCourseSelection}
             >
-              {this.props.courses.map(course => (
-                <MenuItem
-                  primaryText={course.name}
-                />))}
+              {this.state.open ? courseItems : null}
             </Menu>
           </Drawer>
         </div>
@@ -109,9 +108,5 @@ class DashboardHeader extends React.Component {
     );
   }
 }
-
-DashboardHeader.childContextTypes = {
-  muiTheme: React.PropTypes.object.isRequired,
-};
 
 export default withStyles(s)(DashboardHeader);
