@@ -119,7 +119,11 @@ class Dashboard extends React.Component {
   }
 
   onSelectCourse = (index) => {
+    this.stopGettingChatbotMessage();
     this.setState({ courseIndex: index });
+    if (this.state.courses[index].joinType === 'student') {
+      this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+    }
   }
 
   async getChatbotMessage() {
@@ -139,36 +143,56 @@ class Dashboard extends React.Component {
       throw error;
     }).then((resp) => {
       console.log('Dashboard - getChatbotMessage - SUCCESS', resp);
+      const dialog = this.state.dialog.slice();
+      const botMessageIds = this.state.botMessageIds.slice();
+      const dialogIsEmpty = dialog.length === 0;
       resp.forEach((message) => {
-        if (message.senderType === 'chatbot' &&
+        if (!dialogIsEmpty &&
+            message.senderType === 'chatbot' &&
             this.state.botMessageIds.indexOf(message.id) === -1) {
-          const dialog = this.state.dialog.slice();
           dialog.push(
             {
-              sender: 'bot',
+              sender: 'chatbot',
               content: message.content,
             },
           );
-          const botMessageIds = this.state.botMessageIds.slice();
+        } else if (dialogIsEmpty) {
+          dialog.push(
+            {
+              content: message.content,
+              sender: message.senderType ? message.senderType : 'student',
+            },
+          );
+        } else {
+          return;
+        }
+        if (message.senderType === 'chatbot') {
           botMessageIds.push(message.id);
-          this.setState({
-            botMessageIds,
-            dialog,
-          });
-          this.dialogView.scrollTop = this.dialogView.scrollHeight;
         }
       });
+
+      const originalDialog = this.state.dialog.slice();
+      this.setState({
+        botMessageIds,
+        dialog,
+      });
+      if (dialog.length > originalDialog.length) {
+        this.dialogView.scrollTop = this.dialogView.scrollHeight;
+      }
     }).catch((e) => {
       console.log('Dashboard - getChatbotMessage - FAIL', e);
     });
   }
 
-  // TODO: Change the course ID to the correct one
+  stopGettingChatbotMessage = () => {
+    clearInterval(this.timer);
+  }
+
   sendMessage = () => {
     const dialog = this.state.dialog.slice();
     dialog.push(
       {
-        sender: 'user',
+        sender: 'student',
         content: this.state.message,
       },
     );
@@ -185,17 +209,19 @@ class Dashboard extends React.Component {
       },
       credentials: 'same-origin',
       body: JSON.stringify({
-        courseId: 1,
+        courseId: this.state.courses[this.state.courseIndex].id,
         content: this.state.message,
       }),
-    }).then((resp) => {
+    })
+    .then((resp) => {
       if (resp.status >= 200 && resp.status < 300) {
         return resp.json();
       }
       const error = new Error(resp.statusText);
       error.response = resp;
       throw error;
-    }).then((resp) => {
+    })
+    .then((resp) => {
       console.log('Dashboard - sendMessage - SUCCESS', resp);
       this.dialogView.scrollTop = this.dialogView.scrollHeight;
     })
@@ -231,14 +257,14 @@ class Dashboard extends React.Component {
   render() {
     const dialogMessages = this.state.dialog.map((message) => {
       const classNames = {
-        bot: s.botMessage,
-        user: s.userMessage,
+        chatbot: s.botMessage,
+        student: s.userMessage,
       };
 
-      return (<div className={classNames[message.sender]} >
-        <span className={s.messageBubble}>
+      return (<div className={classNames[message.sender]}>
+        <div className={s.messageBubble}>
           {message.content}
-        </span>
+        </div>
       </div>);
     });
 
@@ -257,6 +283,7 @@ class Dashboard extends React.Component {
             username={this.state.username}
             courses={this.state.courses}
             onSelectCourse={this.onSelectCourse}
+            onLogOut={this.stopGettingChatbotMessage}
           />
           <MuiThemeProvider muiTheme={muiTheme}>
             <Paper style={largePaperStyle} zDepth={4}>
