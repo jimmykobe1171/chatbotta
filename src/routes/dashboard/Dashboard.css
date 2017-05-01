@@ -1,0 +1,99 @@
+.dialogView {
+  height: 380px;
+  overflow-y: scroll;
+  padding: 5px;
+}
+
+.botMessage {
+  margin: 5px 0;
+  padding: 5px;
+  text-align: left;
+}
+
+.userMessage {
+  margin: 5px 0;
+  padding: 5px;
+  text-align: right;
+}
+
+.messageBubble {
+  border-radius: 16px;
+  padding: 5px 10px;
+}
+
+.botMessage .messageBubble {
+  background-color: #c1c1c1;
+}
+
+.userMessage .messageBubble {
+  background-color: #a8cee2;
+  color: white;
+}
+
+.textField {
+  height: 100px;
+  overflow-y: hidden;
+  padding-left: 20px;
+  text-align: left;
+}
+
+.sendButton {
+  float: right;
+  margin: 20px;
+}
+
+.questionView {
+  padding: 20px;
+  width: 100%;
+}
+
+.headerRow {
+  background-color: #bdbdbd;
+  height: 40px;
+  width: 100%;
+}
+
+.evenRow {
+  height: 30px;
+  width: 100%;
+}
+
+.oddRow {
+  background-color: #f2f2f2;
+  height: 30px;
+  width: 100%;
+}
+
+.questionColumn {
+  float: left;
+  margin-left: 10px;
+  text-align: left;
+  width: 60%;
+}
+
+.studentNameColumn {
+  float: left;
+  text-align: left;
+  width: 20%;
+}
+
+.dateColumn {
+  float: left;
+  text-align: left;
+}
+
+.headerRow .questionColumn,
+.headerRow .studentNameColumn,
+.headerRow .dateColumn {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.evenRow .questionColumn,
+.evenRow .studentNameColumn,
+.evenRow .dateColumn,
+.oddRow .questionColumn,
+.oddRow .studentNameColumn,
+.oddRow .dateColumn {
+  margin-top: 5px;
+}

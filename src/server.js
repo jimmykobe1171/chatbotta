@@ -18,8 +18,8 @@ import routes from './routes';
 import schema from './data/schema';
 import models from './data/models';
 import { port } from './config';
-import { User } from './data/models';
 import app from './app';
+import { loadFixtures } from './data/utils';
 
 
 if (__DEV__) {
@@ -92,11 +92,8 @@ app.get('*', async (req, res, next) => {
 models.sync({ force: true }).catch(err => console.error(err.stack)).then(() => {
   app.listen(port, () => {
     console.log(`The server is running at http://localhost:${port}/`);
-    User.create({
-      username: 'jimmy',
-      email: 'jimmy@test.com',
-      password: 'jimmy123',
-    });
+    // TODO: remove this! load default data, only for testing
+    loadFixtures();
   });
 });
 /* eslint-enable no-console */

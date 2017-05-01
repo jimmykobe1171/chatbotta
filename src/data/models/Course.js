@@ -12,18 +12,13 @@ import Model from '../sequelize';
 
 
 const Course = Model.define('Course', {
-  id: {
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV1,
-    primaryKey: true,
-    allowNull: false,
-  },
   name: {
     type: DataType.STRING,
     allowNull: false,
   },
   description: {
     type: DataType.TEXT,
+    defaultValue: '',
     allowNull: true,
   },
 }, {

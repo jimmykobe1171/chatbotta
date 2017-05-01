@@ -14,12 +14,6 @@ import Model from '../sequelize';
 const saltRounds = 10;
 
 const User = Model.define('User', {
-  id: {
-    type: DataType.UUID,
-    defaultValue: DataType.UUIDV1,
-    primaryKey: true,
-    allowNull: false,
-  },
   username: {
     type: DataType.STRING,
     allowNull: false,
@@ -50,10 +44,6 @@ const User = Model.define('User', {
       },
     },
   },
-  // type: {
-  //   type: DataType.ENUM('student', 'ta', 'professor'),
-  //   allowNull: false,
-  // },
 }, {
   indexes: [
         { fields: ['email'] },
