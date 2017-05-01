@@ -219,10 +219,10 @@ class Dashboard extends React.Component {
         user: s.userMessage,
       };
 
-      return (<div className={classNames[message.sender]} >
-        <span className={s.messageBubble}>
+      return (<div className={classNames[message.sender]}>
+        <div className={s.messageBubble}>
           {message.content}
-        </span>
+        </div>
       </div>);
     });
 

@@ -16,6 +16,8 @@
 
 .messageBubble {
   border-radius: 16px;
+  display: inline-block;
+  max-width: 500px;
   padding: 5px 10px;
 }
 
