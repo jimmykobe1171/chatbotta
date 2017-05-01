@@ -1,0 +1,65 @@
+
+.evenRow {
+  display: flex;
+  margin: 5px;
+  height: 30px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.oddRow {
+  display: flex;
+  margin: 5px;
+  background-color: #f2f2f2;
+  height: 30px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.textField {
+  display: inline;
+  height: 100px;
+  overflow-y: hidden;
+  padding-left: 20px;
+  padding-bottom: 20px;
+}
+
+.sendButton {
+  float: right;
+  margin: 20px;
+}
+
+.questionColumn {
+  float: left;
+  margin-left: 10px;
+  text-align: left;
+  width: 60%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.studentNameColumn {
+  float: left;
+  text-align: left;
+  width: 18%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.dateColumn {
+  float: left;
+  text-align: left;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.chatbotAnswer{
+  float: left;
+  display: inline;
+  margin: 20px;
+  text-align: left;
+}
+
+.dropDown{
+  margin-bottom: 25px;
+}

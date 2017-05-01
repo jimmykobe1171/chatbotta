@@ -59,22 +59,22 @@ class Dashboard extends React.Component {
         {
           content: 'Can I skip the final?',
           studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
+          updatedAt: '2017-04-30 16:00:18',
         },
         {
           content: 'Can I not submit the final project?',
           studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
+          updatedAt: '2017-04-30 16:00:18',
         },
         {
           content: 'Can I forget to reference in my final paper?',
           studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
+          updatedAt: '2017-04-30 16:00:18',
         },
         {
           content: 'Can I copy my classmate\'s homework?',
           studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
+          updatedAt: '2017-04-30 16:00:18',
         },
       ],
       username: '',
@@ -114,8 +114,7 @@ class Dashboard extends React.Component {
   }
 
   componentDidMount() {
-    /* this.timer = setInterval(() => this.getChatbotMessage(), 1000); */
-    this.getChatbotMessage();
+    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
   }
 
   onSelectCourse = (index) => {
@@ -271,6 +270,7 @@ class Dashboard extends React.Component {
     const questions = this.state.questions.map((question, idx) => (
       <AnswerModal
         className={idx % 2 === 0 ? s.evenRow : s.oddRow}
+        row={idx % 2 === 0 ? s.evenRow : s.oddRow}
         questionContent={question.content}
         studentName={question.studentName}
         updatedAt={question.updatedAt}

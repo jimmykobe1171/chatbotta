@@ -14,7 +14,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-import s from './Dashboard.css';
+import s from './AnswerModal.css';
 
 const muiTheme = getMuiTheme(baseTheme);
 
@@ -27,6 +27,7 @@ class AnswerModal extends React.Component {
     questionContent: PropTypes.string.isRequired,
     studentName: PropTypes.string.isRequired,
     updatedAt: PropTypes.string.isRequired,
+    row: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -55,16 +56,16 @@ class AnswerModal extends React.Component {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div>
-          <div>
-            <button className={s.questionColumn} onClick={this.handleDropDown}>
-              {this.props.questionContent}</button>
+          <div className={this.props.row} onClick={this.handleDropDown}>
+            <span className={s.questionColumn}>
+              {this.props.questionContent}</span>
             <span className={s.studentNameColumn}>{this.props.studentName}</span>
             <span className={s.dateColumn}>{this.props.updatedAt}
             </span>
           </div>
           {this.state.showAnswer ?
-            <div>
-              <div>chatbot answer here</div>
+            <div className={s.dropDown}>
+              <p className={s.chatbotAnswer}>chatbot answer here</p>
               <div className={s.textField}>
                 <TextField
                   hintText="Your Answer"
