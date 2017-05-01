@@ -23,6 +23,7 @@ class DashboardHeader extends React.Component {
   static propTypes = {
     courses: PropTypes.shape.isRequired,
     onSelectCourse: PropTypes.func.isRequired,
+    onLogOut: PropTypes.func.isRequired,
     username: PropTypes.string.isRequired,
   }
 
@@ -47,6 +48,8 @@ class DashboardHeader extends React.Component {
   }
 
   handleLogout = () => {
+    this.props.onLogOut();
+
     fetch('/api/logout', {
       method: 'get',
       headers: {
@@ -70,7 +73,6 @@ class DashboardHeader extends React.Component {
         this.setState({ errorInvalidCred: true });
       });
   }
-
 
   render() {
     const courseItems = this.props.courses.map(course => (<MenuItem
