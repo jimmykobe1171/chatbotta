@@ -55,6 +55,7 @@ class Dashboard extends React.Component {
       message: '',
       username: '',
       userId: null,
+      msgClear: '',
     };
 
     // Get current user
@@ -142,6 +143,7 @@ class Dashboard extends React.Component {
     );
     this.setState({
       dialog,
+      msgClear: '',
     });
 
     fetch('/api/messages/', {
@@ -173,7 +175,14 @@ class Dashboard extends React.Component {
   handleMessageChange = (e) => {
     this.setState({
       message: e.target.value,
+      msgClear: e.target.value,
     });
+  }
+
+  handleEnterKey = (e) => {
+    if (e.key === 'Enter') {
+      this.sendMessage();
+    }
   }
 
   render() {
@@ -207,9 +216,10 @@ class Dashboard extends React.Component {
                     hintText="Your Message"
                     multiLine
                     onChange={this.handleMessageChange}
+                    onKeyDown={this.handleEnterKey}
                     rows={5}
                     style={textFieldStyle}
-                    value={this.state.message}
+                    value={this.state.msgClear}
                   />
                   <RaisedButton
                     className={s.sendButton}
