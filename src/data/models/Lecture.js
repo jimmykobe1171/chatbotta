@@ -12,6 +12,12 @@ import Model from '../sequelize';
 
 
 const Lecture = Model.define('Lecture', {
+  id: {
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV1,
+    primaryKey: true,
+    allowNull: false,
+  },
   name: {
     type: DataType.STRING,
     allowNull: false,

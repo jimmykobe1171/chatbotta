@@ -1,30 +1,43 @@
 import React from 'react';
 import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
 import RaisedButton from 'material-ui/RaisedButton';
-import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './LogInModal.css';
-import history from '../../core/history';
+import ForgotPassword from './ForgotPassword';
 
 const customContentStyle = {
   width: '380px',
   maxWidth: 'none',
 };
 
-class LogInModal extends React.Component {
-  state = {
-    data: [],
-    email: '',
-    errorInvalidCred: false,
-    formValid: false,
-    open: false,
-    password: '',
-  };
+const LogInTextField = () => (
+  <div>
+    <TextField
+      hintText="email"
+      fullWidth
+    /><br />
+    <TextField
+      hintText="password"
+      fullWidth
+    /><br />
+  </div>
+);
 
-  validateEmail = (email) => {
-    const re = /\S+@\S+\.\S+/;
-    return re.test(email);
-  }
+const CheckRemember = () => (
+  <Checkbox
+    label="Remember me"
+  />
+);
+
+/**
+ * A modal dialog can only be closed by selecting one of the actions.
+ */
+export default class LogInModal extends React.Component {
+  state = {
+    open: false,
+  };
 
   handleOpen = () => {
     this.setState({ open: true });
@@ -34,120 +47,41 @@ class LogInModal extends React.Component {
     this.setState({ open: false });
   };
 
-  handleEmailChange = (e) => {
-    this.setState({
-      email: e.target.value,
-      formValid: e.target.value !== '' &&
-          this.validateEmail(e.target.value) &&
-          this.state.password !== '',
-    });
-    this.setState({ errorInvalidCred: false });
-  }
-
-  handlePasswordChange = (e) => {
-    this.setState({
-      password: e.target.value,
-      formValid: e.target.value !== '' &&
-          this.validateEmail(this.state.email) &&
-          this.state.email !== '',
-    });
-    this.setState({ errorInvalidCred: false });
-  }
-
-  handleEnterKeyAtEmailField = (e) => {
-    if (e.key === 'Enter') {
-      if (this.state.formValid) {
-        this.handleLoginSubmit();
-      }
-    }
-  }
-
-  handleLoginSubmit = () => {
-    fetch('/api/login', {
-      method: 'post',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify({
-        email: this.state.email,
-        password: this.state.password,
-      }),
-    }).then((resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp.json();
-      }
-      const error = new Error(resp.statusText);
-      error.response = resp;
-      throw error;
-    })
-      .then((resp) => {
-        console.log('LogInModal - handleLoginSubmit - SUCCESS', resp);
-        history.push('/dashboard');
-      })
-      .catch((e) => {
-        console.log('LogInModal - handleLoginSubmit - FAIL', e);
-        this.setState({ errorInvalidCred: true });
-      });
-  }
-
   render() {
-    const dialogActions = [
-      this.state.formValid ?
-        <RaisedButton
-          className={s.dialogActionButton}
-          label="Sign In"
-          onClick={this.handleLoginSubmit}
-          primary
-        /> :
-          null,
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        onClick={this.handleClose}
+        labelStyle={{ color: '#AFAFAF' }}
+      />,
+      <FlatButton
+        label="Submit"
+        primary
+        onClick={this.handleClose}
+      />,
     ];
 
     return (
       <div>
         <RaisedButton
-          label="Sign In"
+          label="Log in"
           onClick={this.handleOpen}
-          labelColor="#afafaf"
+          labelColor="#AFAFAF"
         />
         <Dialog
-          actions={dialogActions}
+          title="chatbot TA"
           className={s.logInPage}
+          actions={actions}
           modal={false}
           contentStyle={customContentStyle}
           open={this.state.open}
           onRequestClose={this.handleClose}
         >
-          <div className={s.banner}>
-            <div className={s.bannerTitle}>
-              <span>Chatbot TA</span>
-            </div>
-            <div className={s.bannerSubtitle}>
-              <span>Sign in with our TREMENDOUS learning platform</span>
-            </div>
-          </div>
-          <TextField
-            hintText="Email"
-            value={this.state.email}
-            onChange={this.handleEmailChange}
-            fullWidth
-          />
-          <TextField
-            hintText="Password"
-            type="password"
-            value={this.state.password}
-            onChange={this.handlePasswordChange}
-            onKeyDown={this.handleEnterKeyAtEmailField}
-            fullWidth
-          />
-          {this.state.errorInvalidCred ?
-            <span className={s.error}>Invalid username or password.</span> :
-              null}
+          <LogInTextField />
+          <CheckRemember />
+          <ForgotPassword />
         </Dialog>
       </div>
     );
   }
 }
-
-export default withStyles(s)(LogInModal);

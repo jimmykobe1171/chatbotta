@@ -12,10 +12,6 @@ import errorPageStyle from './routes/error/ErrorPage.css';
 import passport from './core/passport';
 import userView from './views/userView';
 import schoolView from './views/schoolView';
-import courseView from './views/courseView';
-import lectureView from './views/lectureView';
-import lectureMaterialView from './views/lectureMaterialView';
-import messageView from './views/messageView';
 
 
 const app = express();
@@ -30,11 +26,11 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 //
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
-app.use(expressSession({ secret: 'keyboard cat' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(expressSession({ secret: 'keyboard cat' }));
 // passport
 app.use(passport.initialize());
 app.use(passport.session());
@@ -43,10 +39,6 @@ app.use(passport.session());
 // -----------------------------------------------------------------------------
 app.use('/api', userView);
 app.use('/api', schoolView);
-app.use('/api', courseView);
-app.use('/api', lectureView);
-app.use('/api', lectureMaterialView);
-app.use('/api', messageView);
 
 //
 // Error handling

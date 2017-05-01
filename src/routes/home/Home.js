@@ -10,14 +10,14 @@
 import React, { } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Home.css';
-import robotImg from '../../images/robots-start.png';
+import robotImg from './robots-start.png';
 
 class Home extends React.Component {
   render() {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <img className={s.robotImg} src={robotImg} alt="robots-start" />
+          <img src={robotImg} width="350" height="380" alt="robots-start" />
           <div className={s.passage}>
             <h1>Meet the bots that will make learning GREAT again</h1>
             <p>Studies that looked at delayed vs. immediate feedback discovered that participants

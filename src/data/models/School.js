@@ -12,6 +12,12 @@ import Model from '../sequelize';
 
 
 const School = Model.define('School', {
+  id: {
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV1,
+    primaryKey: true,
+    allowNull: false,
+  },
   name: {
     type: DataType.STRING,
     allowNull: false,

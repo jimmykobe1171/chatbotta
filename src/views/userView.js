@@ -1,58 +1,19 @@
 import express from 'express';
 import passport from 'passport';
 import { isAuthenticated } from '../core/middleware';
-import { User, School, Course } from '../data/models';
+import { User } from '../data/models';
 
 
 const router = express.Router();
 
-function getUserLoginData(user) {
-  const data = {
-    userId: user.id,
-    email: user.email,
-    username: user.username,
-    courses: [],
-  };
-  return School.findById(user.SchoolId)
-    .then((school) => {
-      data.schoolId = school.id;
-      data.schoolName = school.name;
-      return user.getCourses();
-    })
-    .then((courses) => {
-      for (let i = 0; i < courses.length; i++) {
-        const course = courses[i];
-        const courseData = {
-          id: course.id,
-          name: course.name,
-          joinType: course.UserCourse.joinType,
-        };
-        data.courses.push(courseData);
-      }
-      return data;
-    });
-}
 
 /*
  * get users list
  */
 router.get('/users/', isAuthenticated, (req, res) => {
-  User.findAll({
-    attributes: ['id', 'email', 'username', 'SchoolId'],
-    include: [{
-      model: Course,
-      attributes: ['id', 'name', 'description'],
-      through: {
-        attributes: ['joinType'],
-      },
-    }],
-  })
-        .then((users) => {
-          res.json(users);
-        })
-        .catch((err) => {
-          res.status(400).json({ error: 'get users failed' });
-        });
+  res.json([{ id: 1, email: 'jimmy@test.com' }]);
+    // res.end();
+    // res.status(400).json({error: 'invalid data'})
 });
 
 /*
@@ -68,50 +29,30 @@ router.get('/user/:userId/', isAuthenticated, (req, res) => {
 router.post('/register/', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const schoolId = req.body.school; // school id
+  const school = req.body.school; // school id
   const courses = req.body.courses; // list of course id
-  const courseIds = courses.map(x => x.id);
-  const joinTypes = courses.map(x => ({ joinType: x.joinType }));
-  if (email && password && schoolId) {
-        // create user
-    const dic = {};
+  // console.log(email);
+  // console.log(password);
+  // console.log(school);
+  // console.log(courses);
+  if (email && password && school) {
+    // create user
     User.create({
       username: email,
-      email: email,
-      password: password,
+      email,
+      password,
     })
     .then((user) => {
-      dic.user = user;
-      return School.findById(schoolId);
-    })
-    .then((school) => {
-        // set school to user
-      const user = dic.user;
-      return school.addUser(user);
-    })
-    .then(() => {
-        // set courses to user
-      const user = dic.user;
-      const allPromises = [];
-      for (let i = 0; i < courses.length; i++) {
-        allPromises.push(user.addCourse(courseIds[i], joinTypes[i]));
-      }
-      return Promise.all(allPromises);
-    })
-    .then(() => {
-      const user = dic.user;
-        // login new registered user
-      req.logIn(user, (err) => {
-        if (err) {
-          res.status(400).json({ error: 'login user failed' });
-        } else {
+      user.setSchool(school)
+        .then(() => {
           res.json({ userId: user.id });
-        }
-      });
+        })
+        .catch((err) => {
+          res.status(400).json({ error: err.message });
+        });
     })
     .catch((err) => {
-        // console.log(err.message);
-      res.status(400).json({ error: err.errors[0].message });
+      res.status(400).json({ error: err.message });
     });
   } else {
     res.status(400).json({ error: 'invalid data' });
@@ -127,15 +68,7 @@ router.post('/login/',
         // If this function gets called, authentication was successful.
         // `req.user` contains the authenticated user.
         // res.redirect('/users/' + req.user.username);
-      const user = req.user;
-      getUserLoginData(user)
-        .then((data) => {
-          res.json(data);
-        })
-        .catch((err) => {
-          console.log(err);
-          res.status(400).json({ error: 'login success but get user data failed' });
-        });
+      res.json({});
     },
 );
 
@@ -145,21 +78,6 @@ router.post('/login/',
 router.get('/logout/', isAuthenticated, (req, res) => {
   req.logout();
   res.json({});
-});
-
-/*
- * get current user
- */
-router.get('/current-user/', isAuthenticated, (req, res) => {
-    const user = req.user;
-    getUserLoginData(user)
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json({ error: 'get user data failed' });
-    });
 });
 
 
