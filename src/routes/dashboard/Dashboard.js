@@ -49,13 +49,35 @@ class Dashboard extends React.Component {
 
     this.state = {
       botMessageIds: [],
+      courseIndex: 0,
       courses: [],
       dialog: [],
       inputValid: false,
       message: '',
+      questions: [
+        {
+          content: 'Can I skip the final?',
+          studentName: 'Qipeng Chen',
+          updatedAt: '2017-04-30T16:00:18.741Z',
+        },
+        {
+          content: 'Can I not submit the final project?',
+          studentName: 'Qipeng Chen',
+          updatedAt: '2017-04-30T16:00:18.741Z',
+        },
+        {
+          content: 'Can I forget to reference in my final paper?',
+          studentName: 'Qipeng Chen',
+          updatedAt: '2017-04-30T16:00:18.741Z',
+        },
+        {
+          content: 'Can I copy my classmate\'s homework?',
+          studentName: 'Qipeng Chen',
+          updatedAt: '2017-04-30T16:00:18.741Z',
+        },
+      ],
       username: '',
       userId: null,
-      msgClear: '',
     };
 
     // Get current user
@@ -92,8 +114,12 @@ class Dashboard extends React.Component {
     this.timer = setInterval(() => this.getChatbotMessage(), 1000);
   }
 
+  onSelectCourse = (index) => {
+    this.setState({ courseIndex: index });
+  }
+
   async getChatbotMessage() {
-    fetch(`/api/messages?userId=${this.state.userId}&courseId=1`, {
+    fetch(`/api/messages?userId=${this.state.userId}&courseId=${this.state.courses[this.state.courseIndex].id}`, {
       method: 'get',
       headers: {
         Accept: 'application/json',
@@ -125,6 +151,7 @@ class Dashboard extends React.Component {
             botMessageIds,
             dialog,
           });
+          this.dialogView.scrollTop = this.dialogView.scrollHeight;
         }
       });
     }).catch((e) => {
@@ -143,7 +170,7 @@ class Dashboard extends React.Component {
     );
     this.setState({
       dialog,
-      msgClear: '',
+      message: '',
     });
 
     fetch('/api/messages/', {
@@ -166,6 +193,7 @@ class Dashboard extends React.Component {
       throw error;
     }).then((resp) => {
       console.log('Dashboard - sendMessage - SUCCESS', resp);
+      this.dialogView.scrollTop = this.dialogView.scrollHeight;
     })
     .catch((e) => {
       console.log('Dashboard - sendMessage - FAIL', e);
@@ -174,13 +202,12 @@ class Dashboard extends React.Component {
 
   handleMessageChange = (e) => {
     this.setState({
-      message: e.target.value,
-      msgClear: e.target.value,
+      message: e.target.value.replace(/\n$/, ''),
     });
   }
 
   handleEnterKey = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && this.state.message !== '') {
       this.sendMessage();
     }
   }
@@ -199,38 +226,61 @@ class Dashboard extends React.Component {
       </div>);
     });
 
+    const questions = this.state.questions.map((question, idx) => (
+      <div className={idx % 2 === 0 ? s.evenRow : s.oddRow}>
+        <span className={s.questionColumn}>{question.content}</span>
+        <span className={s.studentNameColumn}>{question.studentName}</span>
+        <span className={s.dateColumn}>{(new Date(question.updatedAt)).toLocaleDateString()}</span>
+      </div>));
+
     return (this.state.username ?
         (<div>
           <DashboardHeader
             username={this.state.username}
             courses={this.state.courses}
+            onSelectCourse={this.onSelectCourse}
           />
           <MuiThemeProvider muiTheme={muiTheme}>
             <Paper style={largePaperStyle} zDepth={4}>
-              <Paper style={smallPaperStyle} zDepth={2}>
-                <div className={s.dialogView}>
-                  {dialogMessages}
-                </div>
-                <div className={s.textField}>
-                  <TextField
-                    hintText="Your Message"
-                    multiLine
-                    onChange={this.handleMessageChange}
-                    onKeyDown={this.handleEnterKey}
-                    rows={5}
-                    style={textFieldStyle}
-                    value={this.state.msgClear}
-                  />
-                  <RaisedButton
-                    className={s.sendButton}
-                    disabled={this.state.message === ''}
-                    label="Send"
-                    labelColor="#afafaf"
-                    onClick={this.sendMessage}
-                    primary
-                  />
-                </div>
-              </Paper>
+              {this.state.courses[this.state.courseIndex].joinType === 'student' ?
+                (<Paper style={smallPaperStyle} zDepth={2}>
+                  <div
+                    className={s.dialogView}
+                    ref={(ref) => { this.dialogView = ref; }}
+                  >
+                    {dialogMessages}
+                  </div>
+                  <div className={s.textField}>
+                    <TextField
+                      hintText="Your Message"
+                      multiLine
+                      onChange={this.handleMessageChange}
+                      onKeyDown={this.handleEnterKey}
+                      rows={5}
+                      style={textFieldStyle}
+                      value={this.state.message}
+                    />
+                    <RaisedButton
+                      className={s.sendButton}
+                      disabled={this.state.message === ''}
+                      label="Send"
+                      labelColor="#afafaf"
+                      onClick={this.sendMessage}
+                      primary
+                    />
+                  </div>
+                </Paper>) :
+                (
+                  <div className={s.questionView}>
+                    <div className={s.headerRow}>
+                      <span className={s.questionColumn}>Question</span>
+                      <span className={s.studentNameColumn}>Student Name</span>
+                      <span className={s.dateColumn}>Date</span>
+                    </div>
+                    {questions}
+                  </div>
+                )
+              }
             </Paper>
           </MuiThemeProvider>
         </div>) :
