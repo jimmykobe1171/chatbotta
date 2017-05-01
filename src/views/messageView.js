@@ -1,7 +1,7 @@
 import express from 'express';
 import { Message } from '../data/models';
 import { isAuthenticated } from '../core/middleware';
-import { MESSAGE_TYPES, MESSAGE_SENDER_TYPES } from '../data/models/constants';
+import { MESSAGE_TYPES, MESSAGE_SENDER_TYPES, CHATBOT_ANSWER_STATUS, TA_ANSWER_STATUS } from '../data/models/constants';
 import apiaiApp from '../core/apiai';
 
 // const express = require('express');
@@ -94,6 +94,93 @@ router.post('/messages/', isAuthenticated, (req, res) => {
     });
   } else {
     res.status(400).json({ error: 'should provide course id and student id and content' });
+  }
+});
+
+
+/*
+ * update answer chatbotAnswerStatus or taAnswerStatus
+ */
+router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
+  const chatbotAnswerStatus = req.body.chatbotAnswerStatus;
+  const taAnswerStatus = req.body.taAnswerStatus;
+  const data = {};
+  const fields = [];
+  let questionId = null;
+  if (chatbotAnswerStatus && taAnswerStatus) {
+    res.status(400).json({ error: 'should not update chatbotAnswerStatus and taAnswerStatus at same time' });
+  }
+  else if (chatbotAnswerStatus || taAnswerStatus) {
+    if (chatbotAnswerStatus) {
+      data.chatbotAnswerStatus = chatbotAnswerStatus;
+      fields.push('chatbotAnswerStatus');
+    }
+    if (taAnswerStatus) {
+      data.taAnswerStatus = taAnswerStatus;
+      fields.push('taAnswerStatus');
+    }
+    Message.findById(req.params.messageId)
+    .then((message) => {
+      questionId = message.questionId;
+      return message.update(data, fields);
+    })
+    .then(() => {
+      // find related question
+      return Message.findById(questionId);
+    })
+    .then((question) => {
+      // update question status
+      return question.update(data, fields);
+    })
+    .then(() => {
+      res.json({});
+    })
+    .catch((err) => {
+      res.status(400).json({ error: 'update message failed' });
+    });
+  }
+  else {
+    res.status(400).json({ error: 'valid fields are chatbotAnswerStatus and taAnswerStatus' });
+  }
+});
+
+
+/*
+ * get all questions related to specific course. For TA and professor use.
+ */
+router.get('/questions/', isAuthenticated, (req, res) => {
+  const courseId = req.query.courseId;
+  const isTA = req.query.isTA == 'true'? true:false;
+  let whereOption = null;
+  if (courseId) {
+    if (isTA) {
+      whereOption = {
+        courseId: courseId,
+        type: MESSAGE_TYPES.QUESTION,
+        chatbotAnswerStatus: {
+          $in: [CHATBOT_ANSWER_STATUS.UNHELPFUL, CHATBOT_ANSWER_STATUS.IRRELEVANT]
+        },
+        taAnswerStatus: null
+      };
+    }
+    else {
+      whereOption = {
+        courseId: courseId,
+        type: MESSAGE_TYPES.QUESTION,
+        taAnswerStatus: TA_ANSWER_STATUS.UNRESOLVED
+      };
+    }
+    Message.findAll({
+      where: whereOption,
+    }).then((messages) => {
+      // const data = get_messages_data(messages);
+      const data = messages;
+      res.json(data);
+    }).catch((err) => {
+      res.status(400).json({ error: 'query questions failed!' });
+    });
+  } else {
+    res.status(400).json({ error: 'should provide course id' });
   }
 });
 
