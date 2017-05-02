@@ -19,6 +19,7 @@ import s from './AnswerModal.css';
 const muiTheme = getMuiTheme(baseTheme);
 
 const textFieldStyle = {
+  marginLeft: '10px',
   width: '80%',
 };
 
@@ -65,25 +66,30 @@ class AnswerModal extends React.Component {
           </div>
           {this.state.showAnswer ?
             <div className={s.dropDown}>
-              <p className={s.chatbotAnswer}>chatbot answer here</p>
-              <div className={s.textField}>
+              <div className={s.chatbotAnswerRow}>
+                <span className={s.chatbotAnswer}>{"Chatbot's answer:"}</span>
+              </div>
+              <div className={s.inputRow}>
                 <TextField
-                  hintText="Your Answer"
+                  hintText="Your answer"
                   multiLine
                   onChange={this.handleTaAnswerChange}
                   style={textFieldStyle}
                   value={this.state.taAnswer}
                 />
-                <RaisedButton
-                  className={s.sendButton}
-                  disabled={this.state.taAnswer === ''}
-                  label="Send"
-                  labelColor="#afafaf"
-                  onClick={this.saveTaAnswer}
-                  primary
-                />
+                <div>
+                  <RaisedButton
+                    className={s.sendButton}
+                    disabled={this.state.taAnswer === ''}
+                    label="Send"
+                    labelColor="#afafaf"
+                    onClick={this.saveTaAnswer}
+                    primary
+                  />
+                </div>
               </div>
-            </div> : null}
+            </div> :
+            null}
         </div>
       </MuiThemeProvider>
     );

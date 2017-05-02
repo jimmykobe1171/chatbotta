@@ -12,11 +12,16 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Popover from 'material-ui/Popover';
+import Linkify from 'react-linkify';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import DashboardHeader from '../../components/DashboardHeader';
 import AnswerModal from './AnswerModal';
+import confusedImg from '../../images/confused.png';
 import fetch from '../../core/fetch';
 import history from '../../core/history';
 import s from './Dashboard.css';
@@ -55,6 +60,7 @@ class Dashboard extends React.Component {
       dialog: [],
       inputValid: false,
       message: '',
+      popoverOpen: false,
       questions: [
         {
           content: 'Can I skip the final?',
@@ -151,17 +157,28 @@ class Dashboard extends React.Component {
             this.state.botMessageIds.indexOf(message.id) === -1) {
           dialog.push(
             {
-              sender: 'chatbot',
               content: message.content,
+              id: message.id,
+              sender: 'chatbot',
             },
           );
         } else if (dialogIsEmpty) {
-          dialog.push(
-            {
-              content: message.content,
-              sender: message.senderType ? message.senderType : 'student',
-            },
-          );
+          if (message.senderType) {
+            dialog.push(
+              {
+                content: message.content,
+                id: message.id,
+                sender: message.senderType,
+              },
+            );
+          } else {
+            dialog.push(
+              {
+                content: message.content,
+                sender: 'student',
+              },
+            );
+          }
         } else {
           return;
         }
@@ -229,6 +246,36 @@ class Dashboard extends React.Component {
     });
   }
 
+  markBotMessage = (e, menuItem, index) => {
+    if (index === 0) {
+      fetch(`/api/messages/${this.state.dialog[this.state.anchorBotMessageIdx].id}/`, {
+        method: 'put',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          chatbotAnswerStatus: 'unhelpful',
+        }),
+      })
+      .then((resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp.json();
+        }
+        const error = new Error(resp.statusText);
+        error.response = resp;
+        throw error;
+      })
+      .then((resp) => {
+        console.log('Dashboard - markBotMessage - SUCCESS', resp);
+      })
+      .catch((err) => {
+        console.log('Dashboard - markBotMessage - FAIL', err);
+      });
+    }
+  }
+
   handleMessageChange = (e) => {
     this.setState({
       message: e.target.value.replace(/\n$/, ''),
@@ -253,17 +300,57 @@ class Dashboard extends React.Component {
     });
   }
 
+  handleBotMessageTap = (e, messageIdx) => {
+    e.preventDefault();
+
+    this.setState({
+      popoverOpen: true,
+      anchorBotMessage: e.currentTarget,
+      anchorBotMessageIdx: messageIdx,
+    });
+  }
+
+  handlePopoverClose = () => {
+    this.setState({
+      popoverOpen: false,
+    });
+  }
+
   render() {
-    const dialogMessages = this.state.dialog.map((message) => {
+    const dialogMessages = this.state.dialog.map((message, messageIdx) => {
       const classNames = {
         chatbot: s.botMessage,
         student: s.userMessage,
       };
 
       return (<div className={classNames[message.sender]}>
-        <div className={s.messageBubble}>
-          {message.content}
+        <div
+          className={s.messageBubble}
+          onTouchTap={e => (message.sender === 'chatbot' ? this.handleBotMessageTap(e, messageIdx) : null)}
+        >
+          <Linkify>
+            {message.content}
+          </Linkify>
         </div>
+        {message.sender === 'chatbot' ?
+          (<Popover
+            open={this.state.popoverOpen}
+            anchorEl={this.state.anchorBotMessage}
+            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+            targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+            onRequestClose={this.handlePopoverClose}
+          >
+            <Menu
+              onItemTouchTap={this.markBotMessage}
+            >
+              <MenuItem
+                primaryText="Mark as unhelpful"
+                leftIcon={<img src={confusedImg} alt="confused-icon" />}
+              />
+            </Menu>
+          </Popover>) :
+          null
+        }
       </div>);
     });
 
@@ -273,7 +360,7 @@ class Dashboard extends React.Component {
         row={idx % 2 === 0 ? s.evenRow : s.oddRow}
         questionContent={question.content}
         studentName={question.studentName}
-        updatedAt={question.updatedAt}
+        updatedAt={(new Date(question.updatedAt)).toLocaleDateString()}
       />
     ));
 
@@ -318,9 +405,9 @@ class Dashboard extends React.Component {
                 (
                   <div className={s.questionView}>
                     <div className={s.headerRow}>
-                      <span className={s.questionColumn}>Question</span>
-                      <span className={s.studentNameColumn}>Student Name</span>
-                      <span className={s.dateColumn}>Date</span>
+                      <span className={s.questionColumn}>{'Question'}</span>
+                      <span className={s.studentNameColumn}>{'Student Name'}</span>
+                      <span className={s.dateColumn}>{'Date'}</span>
                     </div>
                     {questions}
                   </div>
