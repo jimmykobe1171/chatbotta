@@ -131,7 +131,7 @@ class Dashboard extends React.Component {
           questions: resp.map(question => ({
             id: question.id,
             content: question.content,
-            studentName: 'Qipeng Chen',
+            studentName: question.studentEmail,
             updatedAt: question.updatedAt,
           })),
         });
@@ -339,7 +339,6 @@ class Dashboard extends React.Component {
     const dialogMessages = this.state.dialog.map((message, messageIdx) => {
       const classNames = {
         chatbot: s.botMessage,
-        professor: s.taMessage,
         student: s.userMessage,
         ta: s.taMessage,
       };

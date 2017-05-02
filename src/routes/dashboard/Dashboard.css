@@ -85,6 +85,7 @@
 .studentNameColumn {
   float: left;
   text-align: left;
+  width: 25%
 }
 
 .dateColumn {
