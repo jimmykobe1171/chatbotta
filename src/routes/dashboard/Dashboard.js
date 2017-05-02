@@ -19,7 +19,9 @@ import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 import DashboardHeader from '../../components/DashboardHeader';
+import AnswerModal from './AnswerModal';
 import confusedImg from '../../images/confused.png';
 import fetch from '../../core/fetch';
 import history from '../../core/history';
@@ -60,28 +62,8 @@ class Dashboard extends React.Component {
       inputValid: false,
       message: '',
       popoverOpen: false,
-      questions: [
-        {
-          content: 'Can I skip the final?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-        {
-          content: 'Can I not submit the final project?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-        {
-          content: 'Can I forget to reference in my final paper?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-        {
-          content: 'Can I copy my classmate\'s homework?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-      ],
+      snackbarOpen: false,
+      questions: [],
       username: '',
       userId: null,
     };
@@ -109,6 +91,7 @@ class Dashboard extends React.Component {
           username: resp.username,
           courses: resp.courses,
         });
+        this.setupView();
       })
       .catch((e) => {
         console.log('Dashboard - currentUser - FAIL', e);
@@ -116,20 +99,67 @@ class Dashboard extends React.Component {
       });
   }
 
-  componentDidMount() {
-    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
-  }
-
   onSelectCourse = (index) => {
+    if (index === this.state.courseIndex) {
+      return;
+    }
     this.stopGettingChatbotMessage();
-    this.setState({ courseIndex: index });
+    this.setState({
+      botMessageIds: [],
+      courseIndex: index,
+      dialog: [],
+      inputValid: false,
+      message: '',
+    });
     if (this.state.courses[index].joinType === 'student') {
-      this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+      this.startTimer(index);
+    } else if (this.state.courses[index].joinType === 'ta') {
+      this.getQuestions(index);
     }
   }
 
-  async getChatbotMessage() {
-    fetch(`/api/messages?userId=${this.state.userId}&courseId=${this.state.courses[this.state.courseIndex].id}`, {
+  getQuestions = (courseIndex) => {
+    fetch(`/api/questions?courseId=${this.state.courses[courseIndex].id}&isTA=true`, {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
+      }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
+    })
+      .then((resp) => {
+        console.log('Dashboard - getQuestions - SUCCESS', resp);
+        this.setState({
+          questions: resp.map(question => ({
+            id: question.id,
+            content: question.content,
+            studentName: question.studentEmail,
+            updatedAt: question.updatedAt,
+          })),
+        });
+      })
+      .catch((e) => {
+        console.log('Dashboard - getQuestions - FAIL', e);
+      });
+  }
+
+  setupView = () => {
+    if (this.state.courses[this.state.courseIndex].joinType === 'student') {
+      this.startTimer(this.state.courseIndex);
+    } else if (this.state.courses[this.state.courseIndex].joinType === 'ta') {
+      this.getQuestions(this.state.courseIndex);
+    }
+  }
+
+  async getChatbotMessage(courseIndex) {
+    fetch(`/api/messages?userId=${this.state.userId}&courseId=${this.state.courses[courseIndex].id}`, {
       method: 'get',
       headers: {
         Accept: 'application/json',
@@ -166,6 +196,7 @@ class Dashboard extends React.Component {
                 content: message.content,
                 id: message.id,
                 sender: message.senderType,
+                senderEmail: message.senderEmail,
               },
             );
           } else {
@@ -195,6 +226,10 @@ class Dashboard extends React.Component {
     }).catch((e) => {
       console.log('Dashboard - getChatbotMessage - FAIL', e);
     });
+  }
+
+  startTimer = (courseIndex) => {
+    this.timer = setInterval(() => this.getChatbotMessage(courseIndex), 1000);
   }
 
   stopGettingChatbotMessage = () => {
@@ -266,6 +301,10 @@ class Dashboard extends React.Component {
       })
       .then((resp) => {
         console.log('Dashboard - markBotMessage - SUCCESS', resp);
+        this.setState({
+          popoverOpen: false,
+          snackbarOpen: true,
+        });
       })
       .catch((err) => {
         console.log('Dashboard - markBotMessage - FAIL', err);
@@ -301,11 +340,18 @@ class Dashboard extends React.Component {
     });
   }
 
+  handleSnackbarClose = () => {
+    this.setState({
+      snackbarOpen: false,
+    });
+  }
+
   render() {
     const dialogMessages = this.state.dialog.map((message, messageIdx) => {
       const classNames = {
         chatbot: s.botMessage,
         student: s.userMessage,
+        ta: s.taMessage,
       };
 
       return (<div className={classNames[message.sender]}>
@@ -314,37 +360,49 @@ class Dashboard extends React.Component {
           onTouchTap={e => (message.sender === 'chatbot' ? this.handleBotMessageTap(e, messageIdx) : null)}
         >
           <Linkify>
-            {message.content}
+            {message.sender === 'ta' ?
+              ('Your TA ' + message.senderEmail + ' said: ' + message.content) :
+            message.content}
           </Linkify>
         </div>
         {message.sender === 'chatbot' ?
-          (<Popover
-            open={this.state.popoverOpen}
-            anchorEl={this.state.anchorBotMessage}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-            onRequestClose={this.handlePopoverClose}
-          >
-            <Menu
-              onItemTouchTap={this.markBotMessage}
+          (<div>
+            <Popover
+              open={this.state.popoverOpen}
+              anchorEl={this.state.anchorBotMessage}
+              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+              onRequestClose={this.handlePopoverClose}
             >
-              <MenuItem
-                primaryText="Mark as unhelpful"
-                leftIcon={<img src={confusedImg} alt="confused-icon" />}
-              />
-            </Menu>
-          </Popover>) :
-          null
-        }
+              <Menu
+                onItemTouchTap={this.markBotMessage}
+              >
+                <MenuItem
+                  primaryText="Mark as unhelpful"
+                  leftIcon={<img src={confusedImg} alt="confused-icon" />}
+                />
+              </Menu>
+            </Popover>
+            <Snackbar
+              open={this.state.snackbarOpen}
+              message="The chatbot TA's answer has been successfully marked as unhelpful."
+              autoHideDuration={4000}
+              onRequestClose={this.handleSnackbarClose}
+            />
+          </div>) : null}
       </div>);
     });
 
     const questions = this.state.questions.map((question, idx) => (
-      <div className={idx % 2 === 0 ? s.evenRow : s.oddRow}>
-        <span className={s.questionColumn}>{question.content}</span>
-        <span className={s.studentNameColumn}>{question.studentName}</span>
-        <span className={s.dateColumn}>{(new Date(question.updatedAt)).toLocaleDateString()}</span>
-      </div>));
+      <AnswerModal
+        className={idx % 2 === 0 ? s.evenRow : s.oddRow}
+        row={idx % 2 === 0 ? s.evenRow : s.oddRow}
+        questionId={question.id}
+        questionContent={question.content}
+        studentName={question.studentName}
+        updatedAt={(new Date(question.updatedAt)).toLocaleDateString()}
+      />
+    ));
 
     return (this.state.username ?
         (<div>
