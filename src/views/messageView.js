@@ -229,7 +229,7 @@ router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
  */
 router.post('/answers/', isAuthenticated, (req, res) => {
   const senderId = req.user.id;
-  const isTA = req.body.isTA == 'true'? true:false;
+  const isTA = req.body.isTA? true:false;
   const questionId = req.body.questionId;
   const content = req.body.content;
   let question = null;
