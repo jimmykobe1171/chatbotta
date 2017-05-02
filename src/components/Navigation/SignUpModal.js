@@ -26,12 +26,14 @@ class SignUpModal extends React.Component {
         {
           course: null,
           joinType: 'student',
+          checkCourseSelected: this.checkCourseSelected,
           onSelectCourse: this.onSelectCourse,
           onSelectJoinType: this.onSelectJoinType,
           onRemoveCourse: this.onRemoveCourse,
         },
       ],
       email: '',
+      errorDuplicateCourses: false,
       errorNoCourses: false,
       formValid: false,
       mode: SignUpModes.SCHOOL,
@@ -42,19 +44,24 @@ class SignUpModal extends React.Component {
   }
 
   onSelectSchool = (school) => {
-    this.setState({
-      mode: SignUpModes.COURSES,
-      school,
-    });
+    if (school !== null && school !== undefined) {
+      this.setState({
+        mode: SignUpModes.COURSES,
+        school,
+      });
+    }
   }
 
   onSelectCourse = (course, index) => {
-    const courses = this.state.courses.slice();
-    courses[index].course = course;
-    this.setState({
-      courses,
-      errorNoCourses: false,
-    });
+    if (course !== undefined) { // Make sure don't do null here
+      const courses = this.state.courses.slice();
+      courses[index].course = course;
+      this.setState({
+        courses,
+        errorNoCourses: false,
+        errorDuplicateCourses: false,
+      });
+    }
   }
 
   onSelectJoinType = (joinType, index) => {
@@ -82,6 +89,7 @@ class SignUpModal extends React.Component {
       {
         course: null,
         joinType: 'student',
+        checkCourseSelected: this.checkCourseSelected,
         onSelectCourse: this.onSelectCourse,
         onSelectJoinType: this.onSelectJoinType,
         onRemoveCourse: this.onRemoveCourse,
@@ -90,6 +98,7 @@ class SignUpModal extends React.Component {
     this.setState({
       courses,
       errorNoCourses: false,
+      errorDuplicateCourses: false,
     });
   }
 
@@ -119,10 +128,12 @@ class SignUpModal extends React.Component {
     });
   }
 
-  goEditCourses = () => {
-    this.setState({
-      mode: SignUpModes.COURSES,
-    });
+  goEditCourses = (course) => {
+    if (course !== null && course !== undefined) {
+      this.setState({
+        mode: SignUpModes.COURSES,
+      });
+    }
   }
 
   signUp = () => {
@@ -157,6 +168,21 @@ class SignUpModal extends React.Component {
       .catch((e) => {
         console.log('SignUpModal - signUp - FAIL', e);
       });
+  }
+
+  checkCourseSelected = (id) => {
+    for (let i = 0; i < this.state.courses.length; i += 1) {
+      if (this.state.courses[i] && this.state.courses[i].course) {
+        const course = this.state.courses[i].course;
+        if (course.id === id) {
+          this.setState({
+            errorDuplicateCourses: true,
+          });
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   handleOpen = () => {
@@ -221,20 +247,21 @@ class SignUpModal extends React.Component {
              className={s.actionButton}
              label={'Sign Up'}
              labelColor={'#afafaf'}
-             style={{ visibility: 'hidden' }}
+             onClick={this.signUp}
              primary
            />) :
-            null;
+           null;
 
     const actionFourthNestedTernary =
-         this.state.mode === SignUpModes.SUMMARY && this.state.formValid ?
+         this.state.mode === SignUpModes.SUMMARY && !this.state.formValid ?
            (<RaisedButton
              className={s.actionButton}
              label={'Sign Up'}
              labelColor={'#afafaf'}
-             onClick={this.signUp}
+             disabled
              primary
-           />) : actionThirdNestedTernary;
+           />) :
+           actionThirdNestedTernary;
 
     const actions = [
       this.state.mode === SignUpModes.SCHOOL ?
@@ -260,7 +287,9 @@ class SignUpModal extends React.Component {
 
     const courseList = this.state.courses.map((course, index) => (
       <AutoCompleteCourse
+        course={course}
         index={index}
+        checkCourseSelected={course.checkCourseSelected}
         onSelectCourse={course.onSelectCourse}
         onSelectJoinType={course.onSelectJoinType}
         onRemoveCourse={course.onRemoveCourse}
@@ -307,6 +336,7 @@ class SignUpModal extends React.Component {
           contentStyle={customContentStyle}
           open={this.state.open}
           onRequestClose={this.handleClose}
+          onKeyDown={this.handleEnterKey}
         >
           <div className={s.banner}>
             <div className={s.bannerTitle}>
@@ -327,7 +357,10 @@ class SignUpModal extends React.Component {
                      * a similar implementation of an AutoCompleteCourse component
                      */
                   }
-                <AutoCompleteSchool onSelectSchool={this.onSelectSchool} />
+                <AutoCompleteSchool
+                  onSelectSchool={this.onSelectSchool}
+                  school={this.state.school}
+                />
               </div>) :
                null}
           {/* End of select school */}
@@ -386,6 +419,9 @@ class SignUpModal extends React.Component {
 
           {this.state.errorNoCourses ?
             <span className={s.error}>{'Please join at least one course to proceed.'}</span> :
+            null}
+          {this.state.errorDuplicateCourses ?
+            <span className={s.error}>{'You already selected this course. Please select another one.'}</span> :
             null}
         </Dialog>
       </div>

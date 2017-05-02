@@ -20,7 +20,7 @@ function getUserLoginData(user) {
       return user.getCourses();
     })
     .then((courses) => {
-      for (let i = 0; i < courses.length; i++) {
+      for (let i = 0; i < courses.length; i += 1) {
         const course = courses[i];
         const courseData = {
           id: course.id,
@@ -51,7 +51,7 @@ router.get('/users/', isAuthenticated, (req, res) => {
           res.json(users);
         })
         .catch((err) => {
-          res.status(400).json({ error: 'get users failed' });
+          res.status(400).json({ error: `get users failed: ${err.errors[0].message}` });
         });
 });
 
@@ -77,8 +77,8 @@ router.post('/register/', (req, res) => {
     const dic = {};
     User.create({
       username: email,
-      email: email,
-      password: password,
+      email,
+      password,
     })
     .then((user) => {
       dic.user = user;
@@ -93,7 +93,7 @@ router.post('/register/', (req, res) => {
         // set courses to user
       const user = dic.user;
       const allPromises = [];
-      for (let i = 0; i < courses.length; i++) {
+      for (let i = 0; i < courses.length; i += 1) {
         allPromises.push(user.addCourse(courseIds[i], joinTypes[i]));
       }
       return Promise.all(allPromises);
@@ -144,6 +144,7 @@ router.post('/login/',
  */
 router.get('/logout/', isAuthenticated, (req, res) => {
   req.logout();
+  req.session.destroy();
   res.json({});
 });
 
@@ -151,8 +152,8 @@ router.get('/logout/', isAuthenticated, (req, res) => {
  * get current user
  */
 router.get('/current-user/', isAuthenticated, (req, res) => {
-    const user = req.user;
-    getUserLoginData(user)
+  const user = req.user;
+  getUserLoginData(user)
     .then((data) => {
       res.json(data);
     })
