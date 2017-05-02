@@ -19,6 +19,7 @@ import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 import DashboardHeader from '../../components/DashboardHeader';
 import confusedImg from '../../images/confused.png';
 import fetch from '../../core/fetch';
@@ -60,6 +61,7 @@ class Dashboard extends React.Component {
       inputValid: false,
       message: '',
       popoverOpen: false,
+      snackbarOpen: false,
       questions: [
         {
           content: 'Can I skip the final?',
@@ -270,6 +272,9 @@ class Dashboard extends React.Component {
       .catch((err) => {
         console.log('Dashboard - markBotMessage - FAIL', err);
       });
+      this.setState({
+        snackbarOpen: true,
+      });
     }
   }
 
@@ -301,6 +306,12 @@ class Dashboard extends React.Component {
     });
   }
 
+  handleSnackbarClose = () => {
+    this.setState({
+      snackbarOpen: false,
+    });
+  }
+
   render() {
     const dialogMessages = this.state.dialog.map((message, messageIdx) => {
       const classNames = {
@@ -318,24 +329,31 @@ class Dashboard extends React.Component {
           </Linkify>
         </div>
         {message.sender === 'chatbot' ?
-          (<Popover
-            open={this.state.popoverOpen}
-            anchorEl={this.state.anchorBotMessage}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-            onRequestClose={this.handlePopoverClose}
-          >
-            <Menu
-              onItemTouchTap={this.markBotMessage}
+          (<div>
+            <Popover
+              open={this.state.popoverOpen}
+              anchorEl={this.state.anchorBotMessage}
+              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+              onRequestClose={this.handlePopoverClose}
             >
-              <MenuItem
-                primaryText="Mark as unhelpful"
-                leftIcon={<img src={confusedImg} alt="confused-icon" />}
-              />
-            </Menu>
-          </Popover>) :
-          null
-        }
+              <Menu
+                onItemTouchTap={this.markBotMessage}
+              >
+                <MenuItem
+                  primaryText="Mark as unhelpful"
+                  leftIcon={<img src={confusedImg} alt="confused-icon" />}
+                />
+              </Menu>
+            </Popover>
+            {this.state.popoverOpen ?
+              <Snackbar
+                open={this.state.snackbarOpen}
+                message="The chatbot's answer has been marked as unhelpful. Your TA will resolve it shortly"
+                autoHideDuration={4000}
+                onRequestClose={this.handleSnackbarClose}
+              /> : null}
+          </div>) : null}
       </div>);
     });
 
