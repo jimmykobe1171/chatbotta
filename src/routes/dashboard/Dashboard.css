@@ -23,6 +23,7 @@
 
 .botMessage .messageBubble {
   background-color: #c1c1c1;
+  cursor: pointer;
 }
 
 .userMessage .messageBubble {

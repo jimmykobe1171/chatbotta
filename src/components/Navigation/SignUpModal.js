@@ -185,6 +185,12 @@ class SignUpModal extends React.Component {
     });
   }
 
+  handleKey = (e) => {
+    if (e.key === 'Enter' && this.state.formValid) {
+      this.signUp();
+    }
+  }
+
   render() {
     /* TODO:
      * 1. Add onClick actions to the RaisedButtons;
@@ -370,6 +376,7 @@ class SignUpModal extends React.Component {
                     type="password"
                     value={this.state.password}
                     onChange={this.handlePasswordChange}
+                    onKeyDown={this.handleKey}
                     fullWidth
                   />
                 </div>
