@@ -229,6 +229,7 @@ router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
  */
 router.post('/answers/', isAuthenticated, (req, res) => {
   const senderId = req.user.id;
+  const senderEmail = req.user.email;
   const isTA = req.body.isTA? true:false;
   const questionId = req.body.questionId;
   const content = req.body.content;
@@ -250,6 +251,7 @@ router.post('/answers/', isAuthenticated, (req, res) => {
         questionId: question.id,
         senderType: senderType,
         senderId: senderId,
+        senderEmail: senderEmail,
       });
     })
     .then(() => {

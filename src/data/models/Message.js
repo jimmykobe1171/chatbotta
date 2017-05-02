@@ -57,6 +57,10 @@ const Message = Model.define('Message', {
       key: 'id',
     },
   },
+  senderEmail: {
+    type: DataType.STRING,
+    allowNull: true,
+  },
   questionId: {
     type: DataType.INTEGER,
     allowNull: true,
