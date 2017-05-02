@@ -100,10 +100,19 @@ class Dashboard extends React.Component {
   }
 
   onSelectCourse = (index) => {
+    if (index === this.state.courseIndex) {
+      return;
+    }
     this.stopGettingChatbotMessage();
-    this.setState({ courseIndex: index });
+    this.setState({
+      botMessageIds: [],
+      courseIndex: index,
+      dialog: [],
+      inputValid: false,
+      message: '',
+    });
     if (this.state.courses[index].joinType === 'student') {
-      this.startTimer();
+      this.startTimer(index);
     } else if (this.state.courses[index].joinType === 'ta') {
       this.getQuestions(index);
     }
@@ -143,14 +152,14 @@ class Dashboard extends React.Component {
 
   setupView = () => {
     if (this.state.courses[this.state.courseIndex].joinType === 'student') {
-      this.startTimer();
+      this.startTimer(this.state.courseIndex);
     } else if (this.state.courses[this.state.courseIndex].joinType === 'ta') {
       this.getQuestions(this.state.courseIndex);
     }
   }
 
-  async getChatbotMessage() {
-    fetch(`/api/messages?userId=${this.state.userId}&courseId=${this.state.courses[this.state.courseIndex].id}`, {
+  async getChatbotMessage(courseIndex) {
+    fetch(`/api/messages?userId=${this.state.userId}&courseId=${this.state.courses[courseIndex].id}`, {
       method: 'get',
       headers: {
         Accept: 'application/json',
@@ -187,6 +196,7 @@ class Dashboard extends React.Component {
                 content: message.content,
                 id: message.id,
                 sender: message.senderType,
+                senderEmail: message.senderEmail,
               },
             );
           } else {
@@ -218,8 +228,8 @@ class Dashboard extends React.Component {
     });
   }
 
-  startTimer = () => {
-    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+  startTimer = (courseIndex) => {
+    this.timer = setInterval(() => this.getChatbotMessage(courseIndex), 1000);
   }
 
   stopGettingChatbotMessage = () => {
@@ -291,12 +301,13 @@ class Dashboard extends React.Component {
       })
       .then((resp) => {
         console.log('Dashboard - markBotMessage - SUCCESS', resp);
+        this.setState({
+          popoverOpen: false,
+          snackbarOpen: true,
+        });
       })
       .catch((err) => {
         console.log('Dashboard - markBotMessage - FAIL', err);
-      });
-      this.setState({
-        snackbarOpen: true,
       });
     }
   }
@@ -349,7 +360,9 @@ class Dashboard extends React.Component {
           onTouchTap={e => (message.sender === 'chatbot' ? this.handleBotMessageTap(e, messageIdx) : null)}
         >
           <Linkify>
-            {message.content}
+            {message.sender === 'ta' ?
+              ('Your TA ' + message.senderEmail + ' said: ' + message.content) :
+            message.content}
           </Linkify>
         </div>
         {message.sender === 'chatbot' ?

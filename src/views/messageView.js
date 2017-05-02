@@ -157,7 +157,7 @@ router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
  */
 router.get('/questions/', isAuthenticated, (req, res) => {
   const courseId = req.query.courseId;
-  const isTA = req.query.isTA == 'true';
+  const isTA = req.query.isTA? true:false;
   let whereOption = null;
   if (courseId) {
     if (isTA) {
@@ -220,7 +220,8 @@ router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
  */
 router.post('/answers/', isAuthenticated, (req, res) => {
   const senderId = req.user.id;
-  const isTA = !!req.body.isTA;
+  const senderEmail = req.user.email;
+  const isTA = req.body.isTA? true:false;
   const questionId = req.body.questionId;
   const content = req.body.content;
   let question = null;
@@ -239,8 +240,9 @@ router.post('/answers/', isAuthenticated, (req, res) => {
         content,
         type: MESSAGE_TYPES.ANSWER,
         questionId: question.id,
-        senderType,
-        senderId,
+        senderType: senderType,
+        senderId: senderId,
+        senderEmail: senderEmail,
       });
     })
     .then(() => {

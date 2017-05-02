@@ -69,6 +69,7 @@ class AnswerModal extends React.Component {
         console.log('AnswerModal - sendTaAnswer - SUCCESS', resp);
         this.setState({
           taAnswer: '',
+          showAnswer: false,
           snackbarOpen: true,
         });
       })
@@ -132,8 +133,8 @@ class AnswerModal extends React.Component {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div>
-          <div className={this.props.row} onClick={this.handleDropDown}>
-            <span className={s.questionColumn}>
+          <div className={this.props.row}>
+            <span className={s.questionColumn} onClick={this.handleDropDown}>
               {this.props.questionContent}</span>
             <span className={s.studentNameColumn}>{this.props.studentName}</span>
             <span className={s.dateColumn}>{this.props.updatedAt}
@@ -167,15 +168,15 @@ class AnswerModal extends React.Component {
                     primary
                   />
                 </div>
-                <Snackbar
-                  open={this.state.snackbarOpen}
-                  message="Your revised answer has been successfully sent."
-                  autoHideDuration={4000}
-                  onRequestClose={this.handleSnackbarClose}
-                />
               </div>
             </div> :
             null}
+            <Snackbar
+              open={this.state.snackbarOpen}
+              message="Your revised answer has been successfully sent."
+              autoHideDuration={4000}
+              onRequestClose={this.handleSnackbarClose}
+            />
         </div>
       </MuiThemeProvider>
     );

@@ -1,101 +1,46 @@
-.dialogView {
-  height: 380px;
-  overflow-y: scroll;
-  padding: 5px;
+.chatbotAnswerRow {
+  display: flex;
 }
 
-.botMessage {
-  padding: 5px;
-  text-align: left;
-}
-
-.userMessage {
-  padding: 5px;
-  text-align: right;
-}
-
-.taMessage {
-  padding: 5px;
-  text-align: left;
-}
-
-.messageBubble {
-  border-radius: 16px;
-  display: inline-block;
-  max-width: 500px;
-  padding: 5px 10px;
-}
-
-.botMessage .messageBubble {
-  background-color: #c1c1c1;
-  cursor: pointer;
-}
-
-.userMessage .messageBubble {
-  background-color: #a8cee2;
-  color: white;
-}
-
-.taMessage .messageBubble {
-  background-color: rgb(0, 188, 212);
-  color: white;
-}
-
-.textField {
-  height: 100px;
-  overflow-y: hidden;
-  padding-left: 20px;
-  text-align: left;
+.inputRow {
+  display: flex;
 }
 
 .sendButton {
   float: right;
-  margin: 20px;
-}
-
-.questionView {
-  padding: 20px;
-  width: 100%;
-}
-
-.headerRow {
-  background-color: #bdbdbd;
-  height: 40px;
-  width: 100%;
-}
-
-.evenRow {
-  height: 30px;
-  width: 100%;
-}
-
-.oddRow {
-  background-color: #f2f2f2;
-  height: 30px;
-  width: 100%;
+  margin: 10px;
 }
 
 .questionColumn {
+  cursor: pointer;
   float: left;
   margin-left: 10px;
   text-align: left;
   width: 60%;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .studentNameColumn {
   float: left;
   text-align: left;
   width: 25%;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .dateColumn {
   float: left;
   text-align: left;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
-.headerRow .questionColumn,
-.headerRow .studentNameColumn,
-.headerRow .dateColumn {
-  font-weight: bold;
-  margin-top: 10px;
+.chatbotAnswer {
+  float: left;
+  margin: 10px 0 0 10px;
+}
+
+.dropDown {
+  margin-bottom: 5px;
 }
