@@ -29,6 +29,10 @@ const Message = Model.define('Message', {
       key: 'id',
     },
   },
+  studentEmail: {
+    type: DataType.STRING,
+    allowNull: true,
+  },
   courseId: {
     type: DataType.INTEGER,
     allowNull: false,

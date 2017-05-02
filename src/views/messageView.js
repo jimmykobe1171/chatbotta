@@ -1,5 +1,5 @@
 import express from 'express';
-import { Message } from '../data/models';
+import { Message, User } from '../data/models';
 import { isAuthenticated } from '../core/middleware';
 import { MESSAGE_TYPES, MESSAGE_SENDER_TYPES, CHATBOT_ANSWER_STATUS, TA_ANSWER_STATUS } from '../data/models/constants';
 import apiaiApp from '../core/apiai';
@@ -25,16 +25,22 @@ const router = express.Router();
 //   return data
 // }
 
+
 function getApiaiResponseSuccess(question, response) {
     const responseMsg = response.result.fulfillment.speech;
-    Message.create({
-      studentId: question.studentId,
-      courseId: question.courseId,
-      content: responseMsg,
-      type: MESSAGE_TYPES.ANSWER,
-      questionId: question.id,
-      senderType: MESSAGE_SENDER_TYPES.CHATBOT,
-    }).then((message) => {
+    getUserById(question.studentId)
+    .then((student) => {
+      return Message.create({
+        studentId: question.studentId,
+        studentEmail: student.email,
+        courseId: question.courseId,
+        content: responseMsg,
+        type: MESSAGE_TYPES.ANSWER,
+        questionId: question.id,
+        senderType: MESSAGE_SENDER_TYPES.CHATBOT,
+      });
+    })
+    .then((message) => {
       // do nothing
       console.log('create chatbot answer success');
     }).catch((err) => {
@@ -44,6 +50,10 @@ function getApiaiResponseSuccess(question, response) {
 
 function getApiaiResponseFail(error) {
     // do nothing
+}
+
+function getUserById(userId) {
+  return User.findById(userId);
 }
 
 
@@ -79,12 +89,17 @@ router.post('/messages/', isAuthenticated, (req, res) => {
   const courseId = req.body.courseId;
   const content = req.body.content;
   if (courseId && studentId && content) {
-    Message.create({
-      studentId: studentId,
-      courseId: courseId,
-      content: content,
-      type: MESSAGE_TYPES.QUESTION,
-    }).then((message) => {
+    getUserById(studentId)
+    .then((student) => {
+      return  Message.create({
+        studentId: studentId,
+        studentEmail: student.email,
+        courseId: courseId,
+        content: content,
+        type: MESSAGE_TYPES.QUESTION,
+      });
+    })
+   .then((message) => {
       // connect with api.ai
       apiaiApp.getResponse(content, getApiaiResponseSuccess.bind(null, message), getApiaiResponseFail);
       res.json({});
@@ -217,12 +232,18 @@ router.post('/answers/', isAuthenticated, (req, res) => {
   const isTA = req.body.isTA == 'true'? true:false;
   const questionId = req.body.questionId;
   const content = req.body.content;
+  let question = null;
   if (questionId && content && isTA != null) {
     Message.findById(questionId)
-    .then((question) => {
+    .then((question1) => {
+      question = question1;
+      return getUserById(question.studentId);
+    })
+    .then((student) => {
       const senderType = isTA? MESSAGE_SENDER_TYPES.TA: MESSAGE_SENDER_TYPES.PROFESSOR;
       return Message.create({
         studentId: question.studentId,
+        studentEmail: student.email,
         courseId: question.courseId,
         content: content,
         type: MESSAGE_TYPES.ANSWER,
