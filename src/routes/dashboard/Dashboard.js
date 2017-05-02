@@ -19,6 +19,7 @@ import MenuItem from 'material-ui/MenuItem';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
+import Snackbar from 'material-ui/Snackbar';
 import DashboardHeader from '../../components/DashboardHeader';
 import AnswerModal from './AnswerModal';
 import confusedImg from '../../images/confused.png';
@@ -61,11 +62,10 @@ class Dashboard extends React.Component {
       inputValid: false,
       message: '',
       popoverOpen: false,
+      snackbarOpen: false,
       questions: [],
       username: '',
       userId: null,
-      showAnswer: false,
-      taAnswer: '',
     };
 
     // Get current user
@@ -100,10 +100,19 @@ class Dashboard extends React.Component {
   }
 
   onSelectCourse = (index) => {
+    if (index === this.state.courseIndex) {
+      return;
+    }
     this.stopGettingChatbotMessage();
-    this.setState({ courseIndex: index });
+    this.setState({
+      botMessageIds: [],
+      courseIndex: index,
+      dialog: [],
+      inputValid: false,
+      message: '',
+    });
     if (this.state.courses[index].joinType === 'student') {
-      this.startTimer();
+      this.startTimer(index);
     } else if (this.state.courses[index].joinType === 'ta') {
       this.getQuestions(index);
     }
@@ -131,7 +140,7 @@ class Dashboard extends React.Component {
           questions: resp.map(question => ({
             id: question.id,
             content: question.content,
-            studentName: 'Qipeng Chen',
+            studentName: question.studentEmail,
             updatedAt: question.updatedAt,
           })),
         });
@@ -143,14 +152,14 @@ class Dashboard extends React.Component {
 
   setupView = () => {
     if (this.state.courses[this.state.courseIndex].joinType === 'student') {
-      this.startTimer();
+      this.startTimer(this.state.courseIndex);
     } else if (this.state.courses[this.state.courseIndex].joinType === 'ta') {
       this.getQuestions(this.state.courseIndex);
     }
   }
 
-  async getChatbotMessage() {
-    fetch(`/api/messages?userId=${this.state.userId}&courseId=${this.state.courses[this.state.courseIndex].id}`, {
+  async getChatbotMessage(courseIndex) {
+    fetch(`/api/messages?userId=${this.state.userId}&courseId=${this.state.courses[courseIndex].id}`, {
       method: 'get',
       headers: {
         Accept: 'application/json',
@@ -187,6 +196,7 @@ class Dashboard extends React.Component {
                 content: message.content,
                 id: message.id,
                 sender: message.senderType,
+                senderEmail: message.senderEmail,
               },
             );
           } else {
@@ -218,8 +228,8 @@ class Dashboard extends React.Component {
     });
   }
 
-  startTimer = () => {
-    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+  startTimer = (courseIndex) => {
+    this.timer = setInterval(() => this.getChatbotMessage(courseIndex), 1000);
   }
 
   stopGettingChatbotMessage = () => {
@@ -291,6 +301,10 @@ class Dashboard extends React.Component {
       })
       .then((resp) => {
         console.log('Dashboard - markBotMessage - SUCCESS', resp);
+        this.setState({
+          popoverOpen: false,
+          snackbarOpen: true,
+        });
       })
       .catch((err) => {
         console.log('Dashboard - markBotMessage - FAIL', err);
@@ -310,18 +324,6 @@ class Dashboard extends React.Component {
     }
   }
 
-  handleDropDown = () => {
-    this.setState({
-      showAnswer: true,
-    });
-  }
-
-  handleTaAnswerChange = (e) => {
-    this.setState({
-      taAnswer: e.target.value.replace(/\n$/, ''),
-    });
-  }
-
   handleBotMessageTap = (e, messageIdx) => {
     e.preventDefault();
 
@@ -338,11 +340,18 @@ class Dashboard extends React.Component {
     });
   }
 
+  handleSnackbarClose = () => {
+    this.setState({
+      snackbarOpen: false,
+    });
+  }
+
   render() {
     const dialogMessages = this.state.dialog.map((message, messageIdx) => {
       const classNames = {
         chatbot: s.botMessage,
         student: s.userMessage,
+        ta: s.taMessage,
       };
 
       return (<div className={classNames[message.sender]}>
@@ -351,28 +360,36 @@ class Dashboard extends React.Component {
           onTouchTap={e => (message.sender === 'chatbot' ? this.handleBotMessageTap(e, messageIdx) : null)}
         >
           <Linkify>
-            {message.content}
+            {message.sender === 'ta' ?
+              ('Your TA ' + message.senderEmail + ' said: ' + message.content) :
+            message.content}
           </Linkify>
         </div>
         {message.sender === 'chatbot' ?
-          (<Popover
-            open={this.state.popoverOpen}
-            anchorEl={this.state.anchorBotMessage}
-            anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-            targetOrigin={{ horizontal: 'left', vertical: 'top' }}
-            onRequestClose={this.handlePopoverClose}
-          >
-            <Menu
-              onItemTouchTap={this.markBotMessage}
+          (<div>
+            <Popover
+              open={this.state.popoverOpen}
+              anchorEl={this.state.anchorBotMessage}
+              anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+              targetOrigin={{ horizontal: 'left', vertical: 'top' }}
+              onRequestClose={this.handlePopoverClose}
             >
-              <MenuItem
-                primaryText="Mark as unhelpful"
-                leftIcon={<img src={confusedImg} alt="confused-icon" />}
-              />
-            </Menu>
-          </Popover>) :
-          null
-        }
+              <Menu
+                onItemTouchTap={this.markBotMessage}
+              >
+                <MenuItem
+                  primaryText="Mark as unhelpful"
+                  leftIcon={<img src={confusedImg} alt="confused-icon" />}
+                />
+              </Menu>
+            </Popover>
+            <Snackbar
+              open={this.state.snackbarOpen}
+              message="The chatbot TA's answer has been successfully marked as unhelpful."
+              autoHideDuration={4000}
+              onRequestClose={this.handleSnackbarClose}
+            />
+          </div>) : null}
       </div>);
     });
 

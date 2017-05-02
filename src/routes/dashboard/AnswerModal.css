@@ -24,7 +24,7 @@
 .studentNameColumn {
   float: left;
   text-align: left;
-  width: 18%;
+  width: 25%;
   padding-top: 5px;
   padding-bottom: 5px;
 }
@@ -36,11 +36,11 @@
   padding-bottom: 5px;
 }
 
-.chatbotAnswer{
+.chatbotAnswer {
   float: left;
   margin: 10px 0 0 10px;
 }
 
-.dropDown{
+.dropDown {
   margin-bottom: 5px;
 }

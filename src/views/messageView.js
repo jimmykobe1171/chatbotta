@@ -27,22 +27,20 @@ const router = express.Router();
 
 
 function getApiaiResponseSuccess(question, response) {
-    const responseMsg = response.result.fulfillment.speech;
-    getUserById(question.studentId)
-    .then((student) => {
-      return Message.create({
-        studentId: question.studentId,
-        studentEmail: student.email,
-        courseId: question.courseId,
-        content: responseMsg,
-        type: MESSAGE_TYPES.ANSWER,
-        questionId: question.id,
-        senderType: MESSAGE_SENDER_TYPES.CHATBOT,
-      });
-    })
+  const responseMsg = response.result.fulfillment.speech;
+  getUserById(question.studentId)
+    .then(student => Message.create({
+      studentId: question.studentId,
+      studentEmail: student.email,
+      courseId: question.courseId,
+      content: responseMsg,
+      type: MESSAGE_TYPES.ANSWER,
+      questionId: question.id,
+      senderType: MESSAGE_SENDER_TYPES.CHATBOT,
+    }))
     .then((message) => {
       // do nothing
-      console.log('create chatbot answer success');
+      console.log('create chatbot answer success', message);
     }).catch((err) => {
       console.log(err);
     });
@@ -90,23 +88,21 @@ router.post('/messages/', isAuthenticated, (req, res) => {
   const content = req.body.content;
   if (courseId && studentId && content) {
     getUserById(studentId)
-    .then((student) => {
-      return  Message.create({
-        studentId: studentId,
-        studentEmail: student.email,
-        courseId: courseId,
-        content: content,
-        type: MESSAGE_TYPES.QUESTION,
-      });
-    })
+    .then(student => Message.create({
+      studentId,
+      studentEmail: student.email,
+      courseId,
+      content,
+      type: MESSAGE_TYPES.QUESTION,
+    }))
    .then((message) => {
       // connect with api.ai
-      apiaiApp.getResponse(content, getApiaiResponseSuccess.bind(null, message), getApiaiResponseFail);
-      res.json({});
-    }).catch((err) => {
-      console.log(err);
-      res.status(400).json({ error: 'send message failed' });
-    });
+     apiaiApp.getResponse(content, getApiaiResponseSuccess.bind(null, message), getApiaiResponseFail);
+     res.json({});
+   }).catch((err) => {
+     console.log(err);
+     res.status(400).json({ error: 'send message failed' });
+   });
   } else {
     res.status(400).json({ error: 'should provide course id and student id and content' });
   }
@@ -124,8 +120,7 @@ router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
   let questionId = null;
   if (chatbotAnswerStatus && taAnswerStatus) {
     res.status(400).json({ error: 'should not update chatbotAnswerStatus and taAnswerStatus at same time' });
-  }
-  else if (chatbotAnswerStatus || taAnswerStatus) {
+  } else if (chatbotAnswerStatus || taAnswerStatus) {
     if (chatbotAnswerStatus) {
       data.chatbotAnswerStatus = chatbotAnswerStatus;
       fields.push('chatbotAnswerStatus');
@@ -139,22 +134,19 @@ router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
       questionId = message.questionId;
       return message.update(data, fields);
     })
-    .then(() => {
+    .then(() =>
       // find related question
-      return Message.findById(questionId);
-    })
-    .then((question) => {
+       Message.findById(questionId))
+    .then(question =>
       // update question status
-      return question.update(data, fields);
-    })
+       question.update(data, fields))
     .then(() => {
       res.json({});
     })
     .catch((err) => {
       res.status(400).json({ error: 'update message failed' });
     });
-  }
-  else {
+  } else {
     res.status(400).json({ error: 'valid fields are chatbotAnswerStatus and taAnswerStatus' });
   }
 });
@@ -170,19 +162,18 @@ router.get('/questions/', isAuthenticated, (req, res) => {
   if (courseId) {
     if (isTA) {
       whereOption = {
-        courseId: courseId,
+        courseId,
         type: MESSAGE_TYPES.QUESTION,
         chatbotAnswerStatus: {
-          $in: [CHATBOT_ANSWER_STATUS.UNHELPFUL, CHATBOT_ANSWER_STATUS.IRRELEVANT]
+          $in: [CHATBOT_ANSWER_STATUS.UNHELPFUL, CHATBOT_ANSWER_STATUS.IRRELEVANT],
         },
-        taAnswerStatus: null
+        taAnswerStatus: null,
       };
-    }
-    else {
+    } else {
       whereOption = {
-        courseId: courseId,
+        courseId,
         type: MESSAGE_TYPES.QUESTION,
-        taAnswerStatus: TA_ANSWER_STATUS.UNRESOLVED
+        taAnswerStatus: TA_ANSWER_STATUS.UNRESOLVED,
       };
     }
     Message.findAll({
@@ -208,12 +199,12 @@ router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
     where: {
       $or: [
         {
-          id: questionId
+          id: questionId,
         },
         {
-          questionId: questionId
-        }
-      ]
+          questionId,
+        },
+      ],
     },
   }).then((messages) => {
     // const data = get_messages_data(messages);
@@ -241,12 +232,12 @@ router.post('/answers/', isAuthenticated, (req, res) => {
       return getUserById(question.studentId);
     })
     .then((student) => {
-      const senderType = isTA? MESSAGE_SENDER_TYPES.TA: MESSAGE_SENDER_TYPES.PROFESSOR;
+      const senderType = isTA ? MESSAGE_SENDER_TYPES.TA : MESSAGE_SENDER_TYPES.PROFESSOR;
       return Message.create({
         studentId: question.studentId,
         studentEmail: student.email,
         courseId: question.courseId,
-        content: content,
+        content,
         type: MESSAGE_TYPES.ANSWER,
         questionId: question.id,
         senderType: senderType,
