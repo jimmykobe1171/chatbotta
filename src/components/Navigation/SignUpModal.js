@@ -42,10 +42,12 @@ class SignUpModal extends React.Component {
   }
 
   onSelectSchool = (school) => {
-    this.setState({
-      mode: SignUpModes.COURSES,
-      school,
-    });
+    if (school !== null && school !== undefined) {
+      this.setState({
+        mode: SignUpModes.COURSES,
+        school,
+      });
+    }
   }
 
   onSelectCourse = (course, index) => {
@@ -119,10 +121,12 @@ class SignUpModal extends React.Component {
     });
   }
 
-  goEditCourses = () => {
-    this.setState({
-      mode: SignUpModes.COURSES,
-    });
+  goEditCourses = (course) => {
+    if (course !== null && course !== undefined) {
+      this.setState({
+        mode: SignUpModes.COURSES,
+      });
+    }
   }
 
   signUp = () => {
@@ -307,6 +311,7 @@ class SignUpModal extends React.Component {
           contentStyle={customContentStyle}
           open={this.state.open}
           onRequestClose={this.handleClose}
+          onKeyDown={this.handleEnterKey}
         >
           <div className={s.banner}>
             <div className={s.bannerTitle}>

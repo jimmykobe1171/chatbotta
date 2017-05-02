@@ -114,7 +114,7 @@ class AutoCompleteCourse extends React.Component {
           /> :
             (<div className={s.selectedCourse}>
               <div>
-                <span className={s.courseName}>{this.state.course.name}</span>
+                { /* <span className={s.courseName}>{this.state.course.name}</span> */ }
               </div>
               <div>
                 <span>Join as:</span>
