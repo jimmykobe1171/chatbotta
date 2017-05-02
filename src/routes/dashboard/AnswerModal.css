@@ -1,0 +1,46 @@
+.chatbotAnswerRow {
+  display: flex;
+}
+
+.inputRow {
+  display: flex;
+}
+
+.sendButton {
+  float: right;
+  margin: 10px;
+}
+
+.questionColumn {
+  cursor: pointer;
+  float: left;
+  margin-left: 10px;
+  text-align: left;
+  width: 60%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.studentNameColumn {
+  float: left;
+  text-align: left;
+  width: 18%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.dateColumn {
+  float: left;
+  text-align: left;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.chatbotAnswer {
+  float: left;
+  margin: 10px 0 0 10px;
+}
+
+.dropDown {
+  margin-bottom: 5px;
+}

@@ -21,6 +21,7 @@ import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Snackbar from 'material-ui/Snackbar';
 import DashboardHeader from '../../components/DashboardHeader';
+import AnswerModal from './AnswerModal';
 import confusedImg from '../../images/confused.png';
 import fetch from '../../core/fetch';
 import history from '../../core/history';
@@ -62,28 +63,7 @@ class Dashboard extends React.Component {
       message: '',
       popoverOpen: false,
       snackbarOpen: false,
-      questions: [
-        {
-          content: 'Can I skip the final?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-        {
-          content: 'Can I not submit the final project?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-        {
-          content: 'Can I forget to reference in my final paper?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-        {
-          content: 'Can I copy my classmate\'s homework?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30T16:00:18.741Z',
-        },
-      ],
+      questions: [],
       username: '',
       userId: null,
     };
@@ -111,6 +91,7 @@ class Dashboard extends React.Component {
           username: resp.username,
           courses: resp.courses,
         });
+        this.setupView();
       })
       .catch((e) => {
         console.log('Dashboard - currentUser - FAIL', e);
@@ -118,15 +99,53 @@ class Dashboard extends React.Component {
       });
   }
 
-  componentDidMount() {
-    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
-  }
-
   onSelectCourse = (index) => {
     this.stopGettingChatbotMessage();
     this.setState({ courseIndex: index });
     if (this.state.courses[index].joinType === 'student') {
-      this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+      this.startTimer();
+    } else if (this.state.courses[index].joinType === 'ta') {
+      this.getQuestions(index);
+    }
+  }
+
+  getQuestions = (courseIndex) => {
+    fetch(`/api/questions?courseId=${this.state.courses[courseIndex].id}&isTA=true`, {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
+      }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
+    })
+      .then((resp) => {
+        console.log('Dashboard - getQuestions - SUCCESS', resp);
+        this.setState({
+          questions: resp.map(question => ({
+            id: question.id,
+            content: question.content,
+            studentName: 'Qipeng Chen',
+            updatedAt: question.updatedAt,
+          })),
+        });
+      })
+      .catch((e) => {
+        console.log('Dashboard - getQuestions - FAIL', e);
+      });
+  }
+
+  setupView = () => {
+    if (this.state.courses[this.state.courseIndex].joinType === 'student') {
+      this.startTimer();
+    } else if (this.state.courses[this.state.courseIndex].joinType === 'ta') {
+      this.getQuestions(this.state.courseIndex);
     }
   }
 
@@ -197,6 +216,10 @@ class Dashboard extends React.Component {
     }).catch((e) => {
       console.log('Dashboard - getChatbotMessage - FAIL', e);
     });
+  }
+
+  startTimer = () => {
+    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
   }
 
   stopGettingChatbotMessage = () => {
@@ -316,7 +339,9 @@ class Dashboard extends React.Component {
     const dialogMessages = this.state.dialog.map((message, messageIdx) => {
       const classNames = {
         chatbot: s.botMessage,
+        professor: s.taMessage,
         student: s.userMessage,
+        ta: s.taMessage,
       };
 
       return (<div className={classNames[message.sender]}>
@@ -346,23 +371,26 @@ class Dashboard extends React.Component {
                 />
               </Menu>
             </Popover>
-            {this.state.popoverOpen ?
-              <Snackbar
-                open={this.state.snackbarOpen}
-                message="The chatbot's answer has been marked as unhelpful. Your TA will resolve it shortly"
-                autoHideDuration={4000}
-                onRequestClose={this.handleSnackbarClose}
-              /> : null}
+            <Snackbar
+              open={this.state.snackbarOpen}
+              message="The chatbot TA's answer has been successfully marked as unhelpful."
+              autoHideDuration={4000}
+              onRequestClose={this.handleSnackbarClose}
+            />
           </div>) : null}
       </div>);
     });
 
     const questions = this.state.questions.map((question, idx) => (
-      <div className={idx % 2 === 0 ? s.evenRow : s.oddRow}>
-        <span className={s.questionColumn}>{question.content}</span>
-        <span className={s.studentNameColumn}>{question.studentName}</span>
-        <span className={s.dateColumn}>{(new Date(question.updatedAt)).toLocaleDateString()}</span>
-      </div>));
+      <AnswerModal
+        className={idx % 2 === 0 ? s.evenRow : s.oddRow}
+        row={idx % 2 === 0 ? s.evenRow : s.oddRow}
+        questionId={question.id}
+        questionContent={question.content}
+        studentName={question.studentName}
+        updatedAt={(new Date(question.updatedAt)).toLocaleDateString()}
+      />
+    ));
 
     return (this.state.username ?
         (<div>

@@ -26,20 +26,20 @@ const router = express.Router();
 // }
 
 function getApiaiResponseSuccess(question, response) {
-    const responseMsg = response.result.fulfillment.speech;
-    Message.create({
-      studentId: question.studentId,
-      courseId: question.courseId,
-      content: responseMsg,
-      type: MESSAGE_TYPES.ANSWER,
-      questionId: question.id,
-      senderType: MESSAGE_SENDER_TYPES.CHATBOT,
-    }).then((message) => {
+  const responseMsg = response.result.fulfillment.speech;
+  Message.create({
+    studentId: question.studentId,
+    courseId: question.courseId,
+    content: responseMsg,
+    type: MESSAGE_TYPES.ANSWER,
+    questionId: question.id,
+    senderType: MESSAGE_SENDER_TYPES.CHATBOT,
+  }).then((message) => {
       // do nothing
-      console.log('create chatbot answer success');
-    }).catch((err) => {
-      console.log(err);
-    });
+    console.log('create chatbot answer success', message);
+  }).catch((err) => {
+    console.log(err);
+  });
 }
 
 function getApiaiResponseFail(error) {
@@ -80,9 +80,9 @@ router.post('/messages/', isAuthenticated, (req, res) => {
   const content = req.body.content;
   if (courseId && studentId && content) {
     Message.create({
-      studentId: studentId,
-      courseId: courseId,
-      content: content,
+      studentId,
+      courseId,
+      content,
       type: MESSAGE_TYPES.QUESTION,
     }).then((message) => {
       // connect with api.ai
@@ -109,8 +109,7 @@ router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
   let questionId = null;
   if (chatbotAnswerStatus && taAnswerStatus) {
     res.status(400).json({ error: 'should not update chatbotAnswerStatus and taAnswerStatus at same time' });
-  }
-  else if (chatbotAnswerStatus || taAnswerStatus) {
+  } else if (chatbotAnswerStatus || taAnswerStatus) {
     if (chatbotAnswerStatus) {
       data.chatbotAnswerStatus = chatbotAnswerStatus;
       fields.push('chatbotAnswerStatus');
@@ -124,22 +123,19 @@ router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
       questionId = message.questionId;
       return message.update(data, fields);
     })
-    .then(() => {
+    .then(() =>
       // find related question
-      return Message.findById(questionId);
-    })
-    .then((question) => {
+       Message.findById(questionId))
+    .then(question =>
       // update question status
-      return question.update(data, fields);
-    })
+       question.update(data, fields))
     .then(() => {
       res.json({});
     })
     .catch((err) => {
       res.status(400).json({ error: 'update message failed' });
     });
-  }
-  else {
+  } else {
     res.status(400).json({ error: 'valid fields are chatbotAnswerStatus and taAnswerStatus' });
   }
 });
@@ -150,24 +146,23 @@ router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
  */
 router.get('/questions/', isAuthenticated, (req, res) => {
   const courseId = req.query.courseId;
-  const isTA = req.query.isTA == 'true'? true:false;
+  const isTA = req.query.isTA == 'true';
   let whereOption = null;
   if (courseId) {
     if (isTA) {
       whereOption = {
-        courseId: courseId,
+        courseId,
         type: MESSAGE_TYPES.QUESTION,
         chatbotAnswerStatus: {
-          $in: [CHATBOT_ANSWER_STATUS.UNHELPFUL, CHATBOT_ANSWER_STATUS.IRRELEVANT]
+          $in: [CHATBOT_ANSWER_STATUS.UNHELPFUL, CHATBOT_ANSWER_STATUS.IRRELEVANT],
         },
-        taAnswerStatus: null
+        taAnswerStatus: null,
       };
-    }
-    else {
+    } else {
       whereOption = {
-        courseId: courseId,
+        courseId,
         type: MESSAGE_TYPES.QUESTION,
-        taAnswerStatus: TA_ANSWER_STATUS.UNRESOLVED
+        taAnswerStatus: TA_ANSWER_STATUS.UNRESOLVED,
       };
     }
     Message.findAll({
@@ -189,17 +184,16 @@ router.get('/questions/', isAuthenticated, (req, res) => {
  */
 router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
   const questionId = req.params.questionId;
-
   Message.findAll({
     where: {
       $or: [
         {
-          id: questionId
+          id: questionId,
         },
         {
-          questionId: questionId
-        }
-      ]
+          questionId,
+        },
+      ],
     },
   }).then((messages) => {
     // const data = get_messages_data(messages);
@@ -208,6 +202,39 @@ router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
   }).catch((err) => {
     res.status(400).json({ error: 'query question failed!' });
   });
+});
+
+/*
+ * post answer to question, for TA and professor dashboard.
+ */
+router.post('/answers/', isAuthenticated, (req, res) => {
+  const senderId = req.user.id;
+  const isTA = req.body.isTA == 'true';
+  const questionId = req.body.questionId;
+  const content = req.body.content;
+  if (questionId && content && isTA != null) {
+    Message.findById(questionId)
+    .then((question) => {
+      const senderType = isTA ? MESSAGE_SENDER_TYPES.TA : MESSAGE_SENDER_TYPES.PROFESSOR;
+      return Message.create({
+        studentId: question.studentId,
+        courseId: question.courseId,
+        content,
+        type: MESSAGE_TYPES.ANSWER,
+        questionId: question.id,
+        senderType,
+        senderId,
+      });
+    })
+    .then(() => {
+      res.json({});
+    }).catch((err) => {
+      console.log(err);
+      res.status(400).json({ error: 'create answer failed' });
+    });
+  } else {
+    res.status(400).json({ error: 'should provide question id, isTA and content' });
+  }
 });
 
 
