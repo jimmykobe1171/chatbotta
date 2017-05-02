@@ -217,8 +217,7 @@ class Dashboard extends React.Component {
     if (message.senderType !== 'ta') {
       return message.content;
     }
-    // TODO: Deal with the fact that the API doesn't return an ID for message
-    return `To your question "${dialog[message.questionId - 1].content}", your TA ${message.senderEmail} said: ${message.content}`;
+    return `Your TA ${message.senderEmail} said: ${message.content}`;
   }
 
   startTimer = (courseIndex) => {
