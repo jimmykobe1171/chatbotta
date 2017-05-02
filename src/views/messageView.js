@@ -189,7 +189,6 @@ router.get('/questions/', isAuthenticated, (req, res) => {
  */
 router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
   const questionId = req.params.questionId;
-
   Message.findAll({
     where: {
       $or: [
@@ -208,6 +207,39 @@ router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
   }).catch((err) => {
     res.status(400).json({ error: 'query question failed!' });
   });
+});
+
+/*
+ * post answer to question, for TA and professor dashboard.
+ */
+router.post('/answers/', isAuthenticated, (req, res) => {
+  const senderId = req.user.id;
+  const isTA = req.body.isTA == 'true'? true:false;
+  const questionId = req.body.questionId;
+  const content = req.body.content;
+  if (questionId && content && isTA != null) {
+    Message.findById(questionId)
+    .then((question) => {
+      const senderType = isTA? MESSAGE_SENDER_TYPES.TA: MESSAGE_SENDER_TYPES.PROFESSOR;
+      return Message.create({
+        studentId: question.studentId,
+        courseId: question.courseId,
+        content: content,
+        type: MESSAGE_TYPES.ANSWER,
+        questionId: question.id,
+        senderType: senderType,
+        senderId: senderId,
+      });
+    })
+    .then(() => {
+      res.json({});
+    }).catch((err) => {
+      console.log(err);
+      res.status(400).json({ error: 'create answer failed' });
+    });
+  } else {
+    res.status(400).json({ error: 'should provide question id, isTA and content' });
+  }
 });
 
 
