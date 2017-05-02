@@ -22,7 +22,9 @@ const styles = {
 
 class AutoCompleteCourse extends React.Component {
   static propTypes = {
+    course: PropTypes.shape.isRequired,
     index: PropTypes.number.isRequired,
+    checkCourseSelected: PropTypes.func.isRequired,
     onSelectCourse: PropTypes.func.isRequired,
     onSelectJoinType: PropTypes.func.isRequired,
     onRemoveCourse: PropTypes.func.isRequired,
@@ -30,13 +32,16 @@ class AutoCompleteCourse extends React.Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
-      inputCourse: '',
-      course: null,
+      course: this.props.course ? this.props.course.course : null,
       courseData: [],
-      courseSelected: false,
+      courseSelected: this.props.course !== null,
       dataSource: [],
+      inputCourse: '',
+      joinType: this.props.course ? this.props.course.joinType : 'student',
     };
+
     fetch('/api/courses', {
       method: 'get',
       headers: {
@@ -77,11 +82,20 @@ class AutoCompleteCourse extends React.Component {
   }
 
   onNewRequest = (chosenRequest, idx) => {
-    this.setState({
-      course: this.state.courseData[idx],
-      courseSelected: true,
-    });
-    this.props.onSelectCourse(this.state.course, this.props.index);
+    if (idx < 0) {
+      return;
+    }
+    if (!this.props.checkCourseSelected(this.state.courseData[idx].id)) {
+      this.setState({
+        course: this.state.courseData[idx],
+        courseSelected: true,
+      });
+      this.props.onSelectCourse(this.state.course, this.props.index);
+    } else {
+      this.setState({
+        inputCourse: '',
+      });
+    }
   }
 
   editCourse = () => {
@@ -93,6 +107,9 @@ class AutoCompleteCourse extends React.Component {
   }
 
   editJoinType = (e, selectedJoinType) => {
+    this.setState({
+      joinType: selectedJoinType,
+    });
     this.props.onSelectJoinType(selectedJoinType, this.props.index);
   }
 
@@ -100,30 +117,40 @@ class AutoCompleteCourse extends React.Component {
     this.props.onRemoveCourse(this.props.index);
   }
 
+  handleUpdateInput = (input) => {
+    this.setState({
+      inputCourse: input,
+    });
+  }
+
   render() {
     return (
       <div>
-        {!this.state.courseSelected ?
-          <AutoComplete
-            filter={AutoComplete.fuzzyFilter}
-            hintText="e.g. My Course"
-            dataSource={this.state.dataSource}
-            fullWidth
-            maxSearchResults={5}
-            onNewRequest={this.onNewRequest}
-          /> :
+        {this.state.course === null || !this.state.courseSelected ?
+          (<div>
+            <AutoComplete
+              filter={AutoComplete.fuzzyFilter}
+              hintText="e.g. My Course"
+              dataSource={this.state.dataSource}
+              fullWidth
+              maxSearchResults={5}
+              onNewRequest={this.onNewRequest}
+              onUpdateInput={this.handleUpdateInput}
+              searchText={this.state.inputCourse}
+            />
+          </div>) :
             (<div className={s.selectedCourse}>
               <div>
-                { /* <span className={s.courseName}>{this.state.course.name}</span> */ }
+                <span className={s.courseName}>{this.state.course.name}</span>
               </div>
               <div>
                 <span>Join as:</span>
               </div>
               <RadioButtonGroup
-                defaultSelected="student"
                 name="joinType"
                 onChange={this.editJoinType}
                 style={styles.radioButtonGroup}
+                valueSelected={this.state.joinType}
               >
                 <RadioButton
                   label="Student"

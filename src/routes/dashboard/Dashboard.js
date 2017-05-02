@@ -1,7 +1,7 @@
 /**
  * /src/routes/dashboard/Dashboard.js
  *
- * Copyright © 2014-present Yuxuan Chen. All rights reserved.
+ * Copyright © 2017-present Yuxuan Chen. All rights reserved.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE.txt file in the root directory of this source tree.
@@ -55,7 +55,7 @@ class Dashboard extends React.Component {
     super(props);
 
     this.state = {
-      botMessageIds: [],
+      nonUserMessageIds: [],
       courseIndex: 0,
       courses: [],
       dialog: [],
@@ -105,7 +105,7 @@ class Dashboard extends React.Component {
     }
     this.stopGettingChatbotMessage();
     this.setState({
-      botMessageIds: [],
+      nonUserMessageIds: [],
       courseIndex: index,
       dialog: [],
       inputValid: false,
@@ -176,48 +176,30 @@ class Dashboard extends React.Component {
     }).then((resp) => {
       console.log('Dashboard - getChatbotMessage - SUCCESS', resp);
       const dialog = this.state.dialog.slice();
-      const botMessageIds = this.state.botMessageIds.slice();
+      const nonUserMessageIds = this.state.nonUserMessageIds.slice();
       const dialogIsEmpty = dialog.length === 0;
       resp.forEach((message) => {
-        if (!dialogIsEmpty &&
-            message.senderType === 'chatbot' &&
-            this.state.botMessageIds.indexOf(message.id) === -1) {
+        if ((!dialogIsEmpty &&
+             message.senderType &&
+             this.state.nonUserMessageIds.indexOf(message.id) === -1) ||
+            (dialogIsEmpty)) {
           dialog.push(
             {
               content: message.content,
               id: message.id,
-              sender: 'chatbot',
+              senderType: message.senderType ? message.senderType : 'student',
+              senderEmail: message.senderEmail,
             },
           );
-        } else if (dialogIsEmpty) {
-          if (message.senderType) {
-            dialog.push(
-              {
-                content: message.content,
-                id: message.id,
-                sender: message.senderType,
-                senderEmail: message.senderEmail,
-              },
-            );
-          } else {
-            dialog.push(
-              {
-                content: message.content,
-                sender: 'student',
-              },
-            );
-          }
-        } else {
-          return;
         }
-        if (message.senderType === 'chatbot') {
-          botMessageIds.push(message.id);
+        if (message.senderType) {
+          nonUserMessageIds.push(message.id);
         }
       });
 
       const originalDialog = this.state.dialog.slice();
       this.setState({
-        botMessageIds,
+        nonUserMessageIds,
         dialog,
       });
       if (dialog.length > originalDialog.length) {
@@ -240,7 +222,7 @@ class Dashboard extends React.Component {
     const dialog = this.state.dialog.slice();
     dialog.push(
       {
-        sender: 'student',
+        senderType: 'student',
         content: this.state.message,
       },
     );
@@ -326,6 +308,10 @@ class Dashboard extends React.Component {
 
   handleBotMessageTap = (e, messageIdx) => {
     e.preventDefault();
+    // If click on a link
+    if (e.target.tagName === 'A') {
+      return;
+    }
 
     this.setState({
       popoverOpen: true,
@@ -354,18 +340,25 @@ class Dashboard extends React.Component {
         ta: s.taMessage,
       };
 
-      return (<div className={classNames[message.sender]}>
+      const linkStyle = {
+        style: {
+          color: message.senderType === 'chatbot' ? 'black' : 'white',
+        },
+        target: '_blank',
+      };
+
+      return (<div className={classNames[message.senderType]}>
         <div
           className={s.messageBubble}
-          onTouchTap={e => (message.sender === 'chatbot' ? this.handleBotMessageTap(e, messageIdx) : null)}
+          onTouchTap={e => (message.senderType === 'chatbot' ? this.handleBotMessageTap(e, messageIdx) : null)}
         >
-          <Linkify>
-            {message.sender === 'ta' ?
-              ('Your TA ' + message.senderEmail + ' said: ' + message.content) :
+          <Linkify properties={linkStyle}>
+            {message.senderType === 'ta' ?
+              (`Your TA ${message.senderEmail} said: ${message.content}`) :
             message.content}
           </Linkify>
         </div>
-        {message.sender === 'chatbot' ?
+        {message.senderType === 'chatbot' ?
           (<div>
             <Popover
               open={this.state.popoverOpen}

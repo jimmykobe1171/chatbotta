@@ -5,12 +5,13 @@ import MenuItem from 'material-ui/MenuItem';
 export default class AutoCompleteSchool extends React.Component {
   static propTypes = {
     onSelectSchool: PropTypes.func.isRequired,
+    school: PropTypes.shape.isRequired,
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      inputSchool: '',
+      inputSchool: this.props.school ? this.props.school.name : '',
       schoolData: [],
       dataSource: [],
     };
@@ -57,6 +58,12 @@ export default class AutoCompleteSchool extends React.Component {
     this.props.onSelectSchool(this.state.schoolData[index]);
   }
 
+  handleUpdateInput = (newInput) => {
+    this.setState({
+      inputSchool: newInput,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -67,6 +74,8 @@ export default class AutoCompleteSchool extends React.Component {
           fullWidth
           maxSearchResults={5}
           onNewRequest={this.onNewRequest}
+          onUpdateInput={this.handleUpdateInput}
+          searchText={this.state.inputSchool}
         />
       </div>
     );
