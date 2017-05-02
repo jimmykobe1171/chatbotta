@@ -165,7 +165,7 @@ router.put('/messages/:messageId/', isAuthenticated, (req, res) => {
  */
 router.get('/questions/', isAuthenticated, (req, res) => {
   const courseId = req.query.courseId;
-  const isTA = req.query.isTA == 'true'? true:false;
+  const isTA = req.query.isTA? true:false;
   let whereOption = null;
   if (courseId) {
     if (isTA) {
