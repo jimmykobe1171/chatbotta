@@ -20,9 +20,12 @@ import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
 import Snackbar from 'material-ui/Snackbar';
+import IconButton from 'material-ui/IconButton';
 import DashboardHeader from '../../components/DashboardHeader';
 import AnswerModal from './AnswerModal';
 import confusedImg from '../../images/confused.png';
+import robotImg from '../../images/robot.png';
+import refreshImg from '../../images/refresh.png';
 import fetch from '../../core/fetch';
 import history from '../../core/history';
 import s from './Dashboard.css';
@@ -185,7 +188,7 @@ class Dashboard extends React.Component {
             (dialogIsEmpty)) {
           dialog.push(
             {
-              content: message.content,
+              content: this.formatMessageContent(message, dialog),
               id: message.id,
               senderType: message.senderType ? message.senderType : 'student',
               senderEmail: message.senderEmail,
@@ -208,6 +211,14 @@ class Dashboard extends React.Component {
     }).catch((e) => {
       console.log('Dashboard - getChatbotMessage - FAIL', e);
     });
+  }
+
+  formatMessageContent = (message, dialog) => {
+    if (message.senderType !== 'ta') {
+      return message.content;
+    }
+    // TODO: Deal with the fact that the API doesn't return an ID for message
+    return `To your question "${dialog[message.questionId - 1].content}", your TA ${message.senderEmail} said: ${message.content}`;
   }
 
   startTimer = (courseIndex) => {
@@ -294,6 +305,10 @@ class Dashboard extends React.Component {
     }
   }
 
+  refresh = () => {
+    this.getQuestions(this.state.courseIndex);
+  }
+
   handleMessageChange = (e) => {
     this.setState({
       message: e.target.value.replace(/\n$/, ''),
@@ -353,9 +368,7 @@ class Dashboard extends React.Component {
           onTouchTap={e => (message.senderType === 'chatbot' ? this.handleBotMessageTap(e, messageIdx) : null)}
         >
           <Linkify properties={linkStyle}>
-            {message.senderType === 'ta' ?
-              (`Your TA ${message.senderEmail} said: ${message.content}`) :
-            message.content}
+            {message.content}
           </Linkify>
         </div>
         {message.senderType === 'chatbot' ?
@@ -435,15 +448,55 @@ class Dashboard extends React.Component {
                     />
                   </div>
                 </Paper>) :
-                (
-                  <div className={s.questionView}>
-                    <div className={s.headerRow}>
-                      <span className={s.questionColumn}>{'Question'}</span>
-                      <span className={s.studentNameColumn}>{'Student Name'}</span>
-                      <span className={s.dateColumn}>{'Date'}</span>
+                (this.state.questions.length > 0 ?
+                   (<div className={s.questionView}>
+                     <div className={s.headerRow}>
+                       <span className={s.questionColumn}>{'Question'}</span>
+                       <span className={s.studentNameColumn}>{'Student Name'}</span>
+                       <span className={s.dateColumn}>{'Date'}</span>
+                       <IconButton
+                         className={s.refreshButtonWithQuestions}
+                         onTouchTap={this.refresh}
+                         tooltip="Refresh"
+                         tooltipPosition="bottom-center"
+                       >
+                         <img
+                           className={s.refreshImg}
+                           src={refreshImg}
+                           alt="refresh"
+                         />
+                       </IconButton>
+                     </div>
+                     {questions}
+                   </div>) :
+                  (<div>
+                    <div>
+                      <IconButton
+                        className={s.refreshButtonWithNoQuestions}
+                        onTouchTap={this.refresh}
+                        tooltip="Refresh"
+                        tooltipPosition="bottom-center"
+                      >
+                        <img
+                          className={s.refreshImg}
+                          src={refreshImg}
+                          alt="refresh"
+                        />
+                      </IconButton>
                     </div>
-                    {questions}
-                  </div>
+                    <img
+                      className={s.robotImg}
+                      src={robotImg}
+                      alt="robot-img"
+                    />
+                    <div className={s.defaultMsg}>
+                      <span>
+                        {'The chatbot TA is so smart that he correctly ' +
+                          "answered all of the students' questions. Go " +
+                          'watch your favorite HBO show and come back later.'}
+                      </span>
+                    </div>
+                  </div>)
                 )
               }
             </Paper>

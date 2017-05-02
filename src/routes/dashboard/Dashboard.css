@@ -104,3 +104,28 @@
   font-weight: bold;
   margin-top: 10px;
 }
+
+.robotImg {
+  height: 300px;
+  margin-top: 70px;
+}
+
+.refreshButtonWithQuestions {
+  right: 2px;
+  top: -8px;
+}
+
+.refreshButtonWithNoQuestions {
+  float: right;
+  right: 10px;
+}
+
+.refreshImg {
+  height: 30px;
+}
+
+.defaultMsg {
+  color: rgb(0, 188, 212);
+  font-weight: 600;
+  padding: 20px 70px;
+}
