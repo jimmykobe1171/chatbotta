@@ -61,28 +61,7 @@ class Dashboard extends React.Component {
       inputValid: false,
       message: '',
       popoverOpen: false,
-      questions: [
-        {
-          content: 'Can I skip the final?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30 16:00:18',
-        },
-        {
-          content: 'Can I not submit the final project?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30 16:00:18',
-        },
-        {
-          content: 'Can I forget to reference in my final paper?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30 16:00:18',
-        },
-        {
-          content: 'Can I copy my classmate\'s homework?',
-          studentName: 'Qipeng Chen',
-          updatedAt: '2017-04-30 16:00:18',
-        },
-      ],
+      questions: [],
       username: '',
       userId: null,
       showAnswer: false,
@@ -112,6 +91,7 @@ class Dashboard extends React.Component {
           username: resp.username,
           courses: resp.courses,
         });
+        this.setupView();
       })
       .catch((e) => {
         console.log('Dashboard - currentUser - FAIL', e);
@@ -119,15 +99,53 @@ class Dashboard extends React.Component {
       });
   }
 
-  componentDidMount() {
-    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
-  }
-
   onSelectCourse = (index) => {
     this.stopGettingChatbotMessage();
     this.setState({ courseIndex: index });
     if (this.state.courses[index].joinType === 'student') {
-      this.timer = setInterval(() => this.getChatbotMessage(), 1000);
+      this.startTimer();
+    } else if (this.state.courses[index].joinType === 'ta') {
+      this.getQuestions(index);
+    }
+  }
+
+  getQuestions = (courseIndex) => {
+    fetch(`/api/questions?courseId=${this.state.courses[courseIndex].id}&isTA=true`, {
+      method: 'get',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+    }).then((resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp.json();
+      }
+      const error = new Error(resp.statusText);
+      error.response = resp;
+      throw error;
+    })
+      .then((resp) => {
+        console.log('Dashboard - getQuestions - SUCCESS', resp);
+        this.setState({
+          questions: resp.map(question => ({
+            id: question.id,
+            content: question.content,
+            studentName: 'Qipeng Chen',
+            updatedAt: question.updatedAt,
+          })),
+        });
+      })
+      .catch((e) => {
+        console.log('Dashboard - getQuestions - FAIL', e);
+      });
+  }
+
+  setupView = () => {
+    if (this.state.courses[this.state.courseIndex].joinType === 'student') {
+      this.startTimer();
+    } else if (this.state.courses[this.state.courseIndex].joinType === 'ta') {
+      this.getQuestions(this.state.courseIndex);
     }
   }
 
@@ -198,6 +216,10 @@ class Dashboard extends React.Component {
     }).catch((e) => {
       console.log('Dashboard - getChatbotMessage - FAIL', e);
     });
+  }
+
+  startTimer = () => {
+    this.timer = setInterval(() => this.getChatbotMessage(), 1000);
   }
 
   stopGettingChatbotMessage = () => {
@@ -358,6 +380,7 @@ class Dashboard extends React.Component {
       <AnswerModal
         className={idx % 2 === 0 ? s.evenRow : s.oddRow}
         row={idx % 2 === 0 ? s.evenRow : s.oddRow}
+        questionId={question.id}
         questionContent={question.content}
         studentName={question.studentName}
         updatedAt={(new Date(question.updatedAt)).toLocaleDateString()}

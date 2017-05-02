@@ -29,19 +29,47 @@ class AnswerModal extends React.Component {
     studentName: PropTypes.string.isRequired,
     updatedAt: PropTypes.string.isRequired,
     row: PropTypes.string.isRequired,
+    questionId: PropTypes.number.isRequired,
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      chatbotMessage: '',
+      chatbotAnswer: '',
       showAnswer: false,
       taAnswer: '',
     };
   }
 
   handleDropDown = () => {
+    if (!this.state.showAnswer && this.state.chatbotAnswer === '') {
+      fetch(`/api/questions/${this.props.questionId}/`, {
+        method: 'get',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+      })
+      .then((resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp.json();
+        }
+        const error = new Error(resp.statusText);
+        error.response = resp;
+        throw error;
+      })
+      .then((resp) => {
+        console.log('AnswerModal - handleDropDown - SUCCESS', resp);
+        this.setState({
+          chatbotAnswer: resp[1].content,
+        });
+      })
+      .catch((err) => {
+        console.log('AnswerModal - handleDropDown - FAIL', err);
+      });
+    }
     this.setState({
       showAnswer: !this.state.showAnswer,
     });
@@ -67,7 +95,7 @@ class AnswerModal extends React.Component {
           {this.state.showAnswer ?
             <div className={s.dropDown}>
               <div className={s.chatbotAnswerRow}>
-                <span className={s.chatbotAnswer}>{"Chatbot's answer:"}</span>
+                <span className={s.chatbotAnswer}>{`Chatbot's answer: ${this.state.chatbotAnswer}`}</span>
               </div>
               <div className={s.inputRow}>
                 <TextField
