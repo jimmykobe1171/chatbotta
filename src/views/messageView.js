@@ -184,5 +184,31 @@ router.get('/questions/', isAuthenticated, (req, res) => {
   }
 });
 
+/*
+ * get question and its answers.
+ */
+router.get('/questions/:questionId/', isAuthenticated, (req, res) => {
+  const questionId = req.params.questionId;
+
+  Message.findAll({
+    where: {
+      $or: [
+        {
+          id: questionId
+        },
+        {
+          questionId: questionId
+        }
+      ]
+    },
+  }).then((messages) => {
+    // const data = get_messages_data(messages);
+    const data = messages;
+    res.json(data);
+  }).catch((err) => {
+    res.status(400).json({ error: 'query question failed!' });
+  });
+});
+
 
 export default router;
