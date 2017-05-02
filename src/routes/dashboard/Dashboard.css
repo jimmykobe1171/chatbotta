@@ -75,7 +75,7 @@
 .studentNameColumn {
   float: left;
   text-align: left;
-  width: 20%;
+  width: 18%;
 }
 
 .dateColumn {
@@ -90,11 +90,3 @@
   margin-top: 10px;
 }
 
-.evenRow .questionColumn,
-.evenRow .studentNameColumn,
-.evenRow .dateColumn,
-.oddRow .questionColumn,
-.oddRow .studentNameColumn,
-.oddRow .dateColumn {
-  margin-top: 5px;
-}
