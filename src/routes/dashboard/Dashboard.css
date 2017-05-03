@@ -5,29 +5,41 @@
 }
 
 .botMessage {
-  margin: 5px 0;
   padding: 5px;
   text-align: left;
 }
 
 .userMessage {
-  margin: 5px 0;
   padding: 5px;
   text-align: right;
 }
 
+.taMessage {
+  padding: 5px;
+  text-align: left;
+}
+
 .messageBubble {
   border-radius: 16px;
+  display: inline-block;
+  max-width: 500px;
   padding: 5px 10px;
 }
 
 .botMessage .messageBubble {
   background-color: #c1c1c1;
+  cursor: pointer;
 }
 
 .userMessage .messageBubble {
   background-color: #a8cee2;
   color: white;
+}
+
+.taMessage .messageBubble {
+  background-color: rgb(0, 188, 212);
+  color: white;
+  pointer-events: none;
 }
 
 .textField {
@@ -54,12 +66,14 @@
 }
 
 .evenRow {
+  display: inline-table;
   height: 30px;
   width: 100%;
 }
 
 .oddRow {
   background-color: #f2f2f2;
+  display: inline-table;
   height: 30px;
   width: 100%;
 }
@@ -67,14 +81,16 @@
 .questionColumn {
   float: left;
   margin-left: 10px;
+  padding-right: 10px;
   text-align: left;
   width: 60%;
 }
 
 .studentNameColumn {
   float: left;
+  padding-right: 10px;
   text-align: left;
-  width: 20%;
+  width: 25%;
 }
 
 .dateColumn {
@@ -89,11 +105,27 @@
   margin-top: 10px;
 }
 
-.evenRow .questionColumn,
-.evenRow .studentNameColumn,
-.evenRow .dateColumn,
-.oddRow .questionColumn,
-.oddRow .studentNameColumn,
-.oddRow .dateColumn {
-  margin-top: 5px;
+.robotImg {
+  height: 300px;
+  margin-top: 70px;
+}
+
+.refreshButtonWithQuestions {
+  right: 2px;
+  top: -8px;
+}
+
+.refreshButtonWithNoQuestions {
+  float: right;
+  right: 10px;
+}
+
+.refreshImg {
+  height: 30px;
+}
+
+.defaultMsg {
+  color: rgb(0, 188, 212);
+  font-weight: 600;
+  padding: 20px 70px;
 }

@@ -2,41 +2,41 @@ import { User, Course, School } from './models';
 
 
 function loadFixtures() {
-  /*-------------------- data --------------------*/
+  /* -------------------- data --------------------*/
   /*----------------------------------------------*/
   const courseNames = ['Machine Learning', 'Advance Software Engineering', 'Algorithms', 'Natural Language Processing', 'Deep Learning'];
   const schoolNames = [
-  'Columbia University', 'NYU', 'Harvard University', 'MIT',
-  'Princeton University', 'Yale University', 'Stanford University'
+    'Columbia University', 'NYU', 'Harvard University', 'MIT',
+    'Princeton University', 'Yale University', 'Stanford University',
   ];
   const usersData = [
     {
       username: 'jimmy',
       email: 'jimmy@test.com',
-      password: 'jimmy123', 
+      password: 'jimmy123',
     },
     {
       username: 'ethan',
       email: 'ethan@test.com',
-      password: 'ethan123', 
+      password: 'ethan123',
     },
     {
       username: 'tom',
       email: 'tom@test.com',
-      password: 'tom123', 
+      password: 'tom123',
     },
     {
       username: 'rose',
       email: 'rose@test.com',
-      password: 'rose123', 
+      password: 'rose123',
     },
     {
       username: 'jack',
       email: 'jack@test.com',
-      password: 'jack123', 
+      password: 'jack123',
     },
   ];
-  /*-------------------- data end ----------------*/
+  /* -------------------- data end ----------------*/
   /*----------------------------------------------*/
 
   let users = [];
@@ -54,7 +54,7 @@ function loadFixtures() {
     // create courses
     const allPromises = [];
     for (let i = 0; i < courseNames.length; i++) {
-      allPromises.push(Course.create({name: courseNames[i]}));
+      allPromises.push(Course.create({ name: courseNames[i] }));
     }
     return Promise.all(allPromises);
   })
@@ -63,7 +63,7 @@ function loadFixtures() {
     // create schools
     const allPromises = [];
     for (let i = 0; i < schoolNames.length; i++) {
-      allPromises.push(School.create({name: schoolNames[i]}));
+      allPromises.push(School.create({ name: schoolNames[i] }));
     }
     return Promise.all(allPromises);
   })
@@ -72,8 +72,8 @@ function loadFixtures() {
     // link course with school
     const columbia = schools[0];
     return columbia.addCourses(courses);
-  }).
-  then(() => {
+  })
+  .then(() => {
     // link user with school
     const columbia = schools[0];
     return columbia.addUsers(users);
@@ -83,8 +83,13 @@ function loadFixtures() {
     const jimmy = users[0];
     const allPromises = [];
     for (let i = 0; i < 2; i++) {
-        let joinType = i==0? 'student': 'ta';
-        allPromises.push(jimmy.addCourse(courses[i].id, {joinType: joinType}));
+      const joinType = i < 3 ? 'student' : 'ta';
+      allPromises.push(jimmy.addCourse(courses[i].id, { joinType }));
+    }
+    const ethan = users[1];
+    for (let i = 0; i < 2; i++) {
+      const joinType = i < 3 ? 'ta' : 'student';
+      allPromises.push(ethan.addCourse(courses[i].id, { joinType }));
     }
     return Promise.all(allPromises);
   })

@@ -29,6 +29,10 @@ const Message = Model.define('Message', {
       key: 'id',
     },
   },
+  studentEmail: {
+    type: DataType.STRING,
+    allowNull: true,
+  },
   courseId: {
     type: DataType.INTEGER,
     allowNull: false,
@@ -52,6 +56,10 @@ const Message = Model.define('Message', {
      // This is the column name of the referenced model
       key: 'id',
     },
+  },
+  senderEmail: {
+    type: DataType.STRING,
+    allowNull: true,
   },
   questionId: {
     type: DataType.INTEGER,

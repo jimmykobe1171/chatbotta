@@ -45,7 +45,7 @@ h3.promptTitle {
 }
 
 .courseList {
-  max-height: 400px;
+  max-height: 350px;
   overflow-y: scroll;
   width: 100%;
 }
